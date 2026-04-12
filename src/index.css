@@ -1,0 +1,19 @@
+:root {
+  /* Define your motorcycle-theme variables here */
+
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden; /* Prevents bounce/scroll on mobile */
+  background-color: var(--bg);
+  font-family: sans-serif;
+}
+
+#root {
+  height: 100vh;
+  width: 100vw;
+}
+
+
