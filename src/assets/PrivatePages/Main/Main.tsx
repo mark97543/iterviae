@@ -21,14 +21,6 @@ const DASHBOARD_STYLES = `
         padding: 0 var(--gap-medium);
     }
 
-    .logo {
-        font-family: var(--font-main);
-        font-size: var(--font-size-large);
-        color: var(--color-primary);
-        font-weight: bold;
-        letter-spacing: 1px;
-    }
-
     .nav-actions {
         display: flex;
         align-items: center;
@@ -37,82 +29,18 @@ const DASHBOARD_STYLES = `
 
     .logout-link {
         font-family: var(--font-main);
-        font-size: var(--font-size-xxsmall);
+        font-size: 10px;
         color: var(--color-text);
         cursor: pointer;
         opacity: 0.6;
         text-transform: uppercase;
         letter-spacing: 1px;
+        font-weight: bold;
     }
 
     .logout-link:hover {
-        color: var(--color-accent);
+        color: #ef4444;
         opacity: 1;
-    }
-
-    .main-content {
-        flex: 1;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        position: relative;
-    }
-
-    .map-placeholder {
-        width: 100%;
-        height: 100%;
-        background: radial-gradient(circle, #1a1a1a 0%, #121212 100%);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-    }
-
-    .status-badge {
-        background-color: var(--color-surface);
-        border: 1px solid var(--color-border);
-        padding: var(--gap-xsmall) var(--gap-medium);
-        border-radius: 20px;
-        font-size: var(--font-size-xxsmall);
-        color: var(--color-accent);
-        text-transform: uppercase;
-        font-weight: bold;
-        margin-top: var(--gap-medium);
-    }
-
-    .sidebar {
-        position: absolute;
-        top: var(--gap-medium);
-        left: var(--gap-medium);
-        width: 300px;
-        background-color: var(--color-surface);
-        border: 1px solid var(--color-border);
-        border-radius: 4px;
-        padding: var(--gap-medium);
-        box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-        z-index: 10;
-    }
-
-    .user-info {
-        display: flex;
-        align-items: center;
-        gap: var(--gap-small);
-        margin-bottom: var(--gap-medium);
-        padding-bottom: var(--gap-small);
-        border-bottom: 1px solid var(--color-border);
-    }
-
-    .avatar {
-        width: 32px;
-        height: 32px;
-        background-color: var(--color-accent);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-        color: white;
     }
 
     .loading-screen {
@@ -121,9 +49,9 @@ const DASHBOARD_STYLES = `
         display: flex;
         align-items: center;
         justify-content: center;
-        background-color: var(--color-bg);
-        color: var(--color-primary);
-        font-family: var(--font-main);
+        background-color: #09090b;
+        color: #f97316;
+        font-family: monospace;
     }
 `;
 
@@ -147,17 +75,10 @@ const Dashboard = () => {
             });
     }, [navigate]);
 
-    const handleLogout = async () => {
-        try {
-            await fetch('https://api.wade-usa.com/auth/logout', { 
-                method: 'POST',
-                credentials: 'include' 
-            });
-            navigate('/login');
-        } catch (err) {
-            console.error("Logout failed", err);
-            navigate('/login'); // Force redirect anyway
-        }
+    const handleLogout = () => {
+        // Directus GET logout endpoint clears cookies and redirects back
+        const redirect = window.location.origin + '/login';
+        window.location.href = `https://api.wade-usa.com/auth/logout?redirect=${redirect}`;
     };
 
     if (loading) {
@@ -174,12 +95,19 @@ const Dashboard = () => {
             <style>{DASHBOARD_STYLES}</style>
             
             <header className="top-nav">
+                <div style={{ color: '#f97316', fontWeight: 'bold' }}>INSTRUMENTUM</div>
                 <div className="nav-actions">
-                    <span>{user.email}</span>
+                    <span style={{ fontSize: '12px', opacity: 0.8 }}>{user.email}</span>
                     <div className="logout-link" onClick={handleLogout}>Logout</div>
                 </div>
             </header>
 
+            <main style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{ textAlign: 'center' }}>
+                    <h1>Welcome, {user.first_name || 'Rider'}</h1>
+                    <p style={{ opacity: 0.5 }}>OAuth2 Session Verified</p>
+                </div>
+            </main>
         </div>
     );
 };
