@@ -76,37 +76,17 @@ const Dashboard = () => {
     }, [navigate]);
 
     const handleLogout = async () => {
-        // 1. Get the refresh token if it exists in local storage
-        const refreshToken = localStorage.getItem('instrumentum_refresh');
-        
-        // 2. Clear local session immediately for a snappy UI
-        localStorage.removeItem('instrumentum_token');
-        localStorage.removeItem('instrumentum_refresh');
-
         try {
-            // 3. Attempt to invalidate session on the server
-            // We only send the body if we have a token; otherwise, we just let the redirect happen
-            if (refreshToken) {
-                await fetch('https://api.wade-usa.com/auth/logout', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ refresh_token: refreshToken }),
-                    credentials: 'include'
-                });
-            } else {
-                // If no token in JS (cookie mode), we still try an empty POST 
-                // to trigger cookie clearing if Directus is configured for it.
-                await fetch('https://api.wade-usa.com/auth/logout', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({}), 
-                    credentials: 'include'
-                });
-            }
+            // For cookie-based auth, Directus reads the secure cookie automatically.
+            // Sending a JSON body causes a 400 validation error, so we send a bare POST.
+            await fetch('https://api.wade-usa.com/auth/logout', {
+                method: 'POST',
+                credentials: 'include'
+            });
         } catch (err) {
-            console.warn("Server-side logout could not be completed, proceeding with local logout.");
+            console.warn("Logout network request failed:", err);
         } finally {
-            // 4. Always redirect to login
+            // Always redirect to login
             navigate('/login');
         }
     };
