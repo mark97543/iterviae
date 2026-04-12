@@ -76,27 +76,37 @@ const Dashboard = () => {
     }, [navigate]);
 
     const handleLogout = async () => {
-        try {
-            // Check if we have a refresh token in storage (if using mode=json)
-            const refreshToken = localStorage.getItem('instrumentum_refresh');
-            
-            const logoutBody = refreshToken ? JSON.stringify({ refresh_token: refreshToken }) : null;
+        // 1. Get the refresh token if it exists in local storage
+        const refreshToken = localStorage.getItem('instrumentum_refresh');
+        
+        // 2. Clear local session immediately for a snappy UI
+        localStorage.removeItem('instrumentum_token');
+        localStorage.removeItem('instrumentum_refresh');
 
-            await fetch('https://api.wade-usa.com/auth/logout', {
-                method: 'POST',
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: logoutBody
-            });
+        try {
+            // 3. Attempt to invalidate session on the server
+            // We only send the body if we have a token; otherwise, we just let the redirect happen
+            if (refreshToken) {
+                await fetch('https://api.wade-usa.com/auth/logout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ refresh_token: refreshToken }),
+                    credentials: 'include'
+                });
+            } else {
+                // If no token in JS (cookie mode), we still try an empty POST 
+                // to trigger cookie clearing if Directus is configured for it.
+                await fetch('https://api.wade-usa.com/auth/logout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({}), 
+                    credentials: 'include'
+                });
+            }
         } catch (err) {
-            console.error("Server logout failed, clearing local session:", err);
+            console.warn("Server-side logout could not be completed, proceeding with local logout.");
         } finally {
-            // Clear local storage tokens regardless
-            localStorage.removeItem('instrumentum_token');
-            localStorage.removeItem('instrumentum_refresh');
-            // Always redirect to login
+            // 4. Always redirect to login
             navigate('/login');
         }
     };
