@@ -77,20 +77,26 @@ const Dashboard = () => {
 
     const handleLogout = async () => {
         try {
-            // Directus standard logout usually requires a POST.
-            // If the endpoint is missing or restricted, we clear local session 
-            // and redirect to the auth login page to reset the cookie state.
+            // Check if we have a refresh token in storage (if using mode=json)
+            const refreshToken = localStorage.getItem('instrumentum_refresh');
+            
+            const logoutBody = refreshToken ? JSON.stringify({ refresh_token: refreshToken }) : null;
+
             await fetch('https://api.wade-usa.com/auth/logout', {
                 method: 'POST',
                 credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json'
-                }
+                },
+                body: logoutBody
             });
         } catch (err) {
             console.error("Server logout failed, clearing local session:", err);
         } finally {
-            // Always redirect to login regardless of server response
+            // Clear local storage tokens regardless
+            localStorage.removeItem('instrumentum_token');
+            localStorage.removeItem('instrumentum_refresh');
+            // Always redirect to login
             navigate('/login');
         }
     };
