@@ -174,37 +174,12 @@ const Dashboard = () => {
             <style>{DASHBOARD_STYLES}</style>
             
             <header className="top-nav">
-                <div className="logo">INSTRUMENTUM</div>
                 <div className="nav-actions">
                     <span>{user.email}</span>
                     <div className="logout-link" onClick={handleLogout}>Logout</div>
                 </div>
             </header>
 
-            <main className="main-content">
-                <div className="sidebar">
-                    <div className="user-info">
-                        <div className="avatar">{user.email[0].toUpperCase()}</div>
-                        <div>
-                            <h5>Authenticated Rider</h5>
-                            <span>{user.email}</span>
-                        </div>
-                    </div>
-                    
-                    <h3>Route Planning</h3>
-                    <p>Select waypoints on the map to begin generating your twisty route.</p>
-                    
-                    <button className="std-button" style={{width: '100%', marginTop: 'var(--gap-medium)'}}>
-                        Generate Curvy Route
-                    </button>
-                </div>
-
-                <div className="map-placeholder">
-                    <h2>Map Engine Offline</h2>
-                    <p>MapLibre GL will initialize here once T2.3 begins.</p>
-                    <div className="status-badge">Authenticated Session Active</div>
-                </div>
-            </main>
         </div>
     );
 };
