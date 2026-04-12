@@ -1,19 +1,147 @@
 :root {
   /* Define your motorcycle-theme variables here */
+  --color-bg: #121212;  /* Main UI background*/
+  --color-surface: #303030; /* Card surfaces, navigation bars*/
+  --color-primary: #E5E5E5;/* Headers, primary text, icons*/
+  --color-accent: #D00000;/* CTAs, active route markers, alerts*/
+  --color-text: #E5E5E5;/* Main UI background*/
+  --color-border: #333333; /*Dividers and subtle outlines */
 
+  /*Misc */
+  --font-main: 'Roboto Condensed', sans-serif;
+  --transition: all 0.3s ease;
+
+  /*Gaps */
+  --gap-xxsmall: 2px;
+  --gap-xsmall: 5px;
+  --gap-small: 10px;
+  --gap-medium: 20px;
+  --gap-large: 30px;
+  --gap-xlarge: 40px;
+  --gap-xxlarge: 50px;
+
+  /* Font Sizes */
+  --font-size-xxsmall: 0.75rem;
+  --font-size-xsmall: 0.875rem;
+  --font-size-small: 1rem;
+  --font-size-medium: 1.125rem;
+  --font-size-large: 1.25rem;
+  --font-size-xlarge: 1.5rem;
+  --font-size-xxlarge: 2rem;
+  --font-size-xxxlarge: 2.5rem;
+
+  /* Window Sizes */
+  --desktop-width: 1200px;
+  --tablet-width: 768px;
+  --mobile-width: 480px;
 }
 
 body {
   margin: 0;
   padding: 0;
-  overflow: hidden; /* Prevents bounce/scroll on mobile */
-  background-color: var(--bg);
+  min-height: 100vh;
+  background-color: var(--color-bg);
+  color: var(--color-text);
   font-family: sans-serif;
 }
 
 #root {
-  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
   width: 100vw;
+  padding: var(--gap-medium);
+  box-sizing: border-box;
 }
 
+/* -------------------------------------------------------------------------- */
+/*                                   Headers                                  */
+/* -------------------------------------------------------------------------- */
+h1{
+  font-size: var(--font-size-xxxlarge);
+  font-family: var(--font-main);
+  color: var(--color-primary);
+}
 
+h2{
+  font-size: var(--font-size-xxlarge);
+  font-family: var(--font-main);
+  color: var(--color-accent);
+}
+
+h3{
+  font-size: var(--font-size-xlarge);
+  font-family: var(--font-main);
+  color: var(--color-primary);
+}
+
+h4{
+  font-size: var(--font-size-large);
+  font-family: var(--font-main);
+  color: var(--color-primary);
+}
+
+h5{
+  font-size: var(--font-size-medium);
+  font-family: var(--font-main);
+  color: var(--color-primary);
+}
+
+h6{
+  font-size: var(--font-size-small);
+  font-family: var(--font-main);
+  color: var(--color-primary);
+}
+
+p{
+  font-size: var(--font-size-small);
+  font-family: var(--font-main);
+  color: var(--color-primary);
+}
+
+span{
+  font-size: var(--font-size-xsmall);
+  font-family: var(--font-main);
+  color: var(--color-primary);
+}
+
+/* -------------------------------------------------------------------------- */
+/*                                   Buttons                                  */
+/* -------------------------------------------------------------------------- */
+.std-button {
+  background-color: var(--color-accent);
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.6rem 1.5rem;
+  border-radius: 4px;
+  font-family: var(--font-main);
+  font-weight: bold;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.std-button:hover {
+  background-color: #f00000; /* Brightened red for hover */
+  box-shadow: 0 0 20px rgba(208, 0, 0, 0.4);
+  transform: translateY(-1px);
+}
+
+.std-button:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+.std-button:disabled {
+  background-color: var(--color-border);
+  cursor: not-allowed;
+  opacity: 0.5;
+  box-shadow: none;
+}
