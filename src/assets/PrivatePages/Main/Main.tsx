@@ -75,10 +75,24 @@ const Dashboard = () => {
             });
     }, [navigate]);
 
-    const handleLogout = () => {
-        // Directus GET logout endpoint clears cookies and redirects back
-        const redirect = window.location.origin + '/login';
-        window.location.href = `https://api.wade-usa.com/auth/logout?redirect=${redirect}`;
+    const handleLogout = async () => {
+        try {
+            // Directus standard logout usually requires a POST.
+            // If the endpoint is missing or restricted, we clear local session 
+            // and redirect to the auth login page to reset the cookie state.
+            await fetch('https://api.wade-usa.com/auth/logout', {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+        } catch (err) {
+            console.error("Server logout failed, clearing local session:", err);
+        } finally {
+            // Always redirect to login regardless of server response
+            navigate('/login');
+        }
     };
 
     if (loading) {
