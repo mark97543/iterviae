@@ -105,6 +105,7 @@ const Dashboard = () => {
         })
         .catch(refreshErr => {
             console.log("Refresh via cookie failed:", refreshErr);
+            window.lastRefreshErr = String(refreshErr);
             // Fallback: try existing token from storage if we had one
             const existingToken = localStorage.getItem('instrumentum_token');
             if (existingToken) {
@@ -129,7 +130,8 @@ const Dashboard = () => {
                     <strong>DEBUG INFO:</strong><br/>
                     URL: {window.location.origin + window.location.pathname}<br/>
                     SEARCH: {window.location.search || "(empty)"}<br/>
-                    LOCAL_TOKEN: {localStorage.getItem('instrumentum_token') ? "Present" : "Missing"}
+                    LOCAL_TOKEN: {localStorage.getItem('instrumentum_token') ? "Present" : "Missing"}<br/>
+                    REFRESH_ERR: {typeof error === 'string' && error.startsWith('No login') ? window.lastRefreshErr || 'None' : 'N/A'}
                 </div>
 
                 <button className="btn" onClick={() => navigate('/login')}>Try Login Again</button>
