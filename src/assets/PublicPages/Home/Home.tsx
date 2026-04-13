@@ -7,8 +7,6 @@ const Home = () =>{
 
     return(
         <div className='home-container'>
-            <h1>Iter Viae</h1>
-            <h2>The Way of the Road</h2>
             <Welcome/>
             <button className='std-button' onClick={()=>navigate('/login')}>Begin Your Journey</button>
         </div>

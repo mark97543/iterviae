@@ -7,7 +7,7 @@ const Welcome = () =>{
     const [content, setContent]=useState('')
 
     useEffect(()=>{
-        fetch('https://api.wade-usa.com/items/home_page_intro')
+        fetch('https://api.wade-usa.com/items/home_page')
         .then(res=>res.json())
         .then(result =>{
             setContent(result.data.intro)
