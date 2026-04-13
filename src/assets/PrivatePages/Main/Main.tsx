@@ -61,7 +61,30 @@ const Dashboard = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        fetch('https://api.wade-usa.com/users/me', { credentials: 'include' })
+        // 1. Check for tokens in URL (if redirected from Google login with mode=json)
+        const params = new URLSearchParams(window.location.search);
+        const urlToken = params.get('access_token');
+        const urlRefresh = params.get('refresh_token');
+
+        if (urlToken) {
+            localStorage.setItem('instrumentum_token', urlToken);
+            if (urlRefresh) localStorage.setItem('instrumentum_refresh', urlRefresh);
+            // Clean the URL so tokens aren't visible
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+
+        // 2. Retrieve token for session verification
+        const token = localStorage.getItem('instrumentum_token');
+
+        if (!token) {
+            navigate('/login');
+            return;
+        }
+
+        // 3. Verify session using Authorization header instead of cookies
+        fetch('https://api.wade-usa.com/users/me', { 
+            headers: { 'Authorization': `Bearer ${token}` } 
+        })
             .then(res => {
                 if (!res.ok) throw new Error('Unauthorized');
                 return res.json();
@@ -71,32 +94,30 @@ const Dashboard = () => {
                 setLoading(false);
             })
             .catch(() => {
+                localStorage.removeItem('instrumentum_token');
+                localStorage.removeItem('instrumentum_refresh');
                 navigate('/login');
             });
     }, [navigate]);
 
     const handleLogout = async () => {
         try {
-            console.log("Initiating logout request to Directus...");
+            const refreshToken = localStorage.getItem('instrumentum_refresh');
             
-            const response = await fetch('https://api.wade-usa.com/auth/logout', {
-                method: 'POST',
-                credentials: 'include'
-            });
-
-            if (!response.ok) {
-                // If we get a 400, parse the JSON body to see the exact Directus error
-                const errorData = await response.json().catch(() => null) || await response.text();
-                console.error(`Logout Failed! Status: ${response.status}`);
-                console.error("Directus Error Details:", JSON.stringify(errorData, null, 2));
-            } else {
-                console.log("Logout successful on server.");
+            // Clean server-side logout using the explicit refresh token
+            if (refreshToken) {
+                await fetch('https://api.wade-usa.com/auth/logout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ refresh_token: refreshToken })
+                });
             }
         } catch (err) {
-            console.error("Logout network request failed completely:", err);
+            console.error("Logout network request failed:", err);
         } finally {
-            // Always redirect to login
-            console.log("Redirecting to login...");
+            // Guarantee local cleanup and redirect
+            localStorage.removeItem('instrumentum_token');
+            localStorage.removeItem('instrumentum_refresh');
             navigate('/login');
         }
     };
@@ -125,7 +146,7 @@ const Dashboard = () => {
             <main style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <div style={{ textAlign: 'center' }}>
                     <h1>Welcome, {user.first_name || 'Rider'}</h1>
-                    <p style={{ opacity: 0.5 }}>OAuth2 Session Verified</p>
+                    <p style={{ opacity: 0.5 }}>JWT Session Verified</p>
                 </div>
             </main>
         </div>
