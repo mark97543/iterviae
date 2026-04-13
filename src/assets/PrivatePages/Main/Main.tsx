@@ -63,6 +63,7 @@ const DASHBOARD_STYLES = `
         padding: 20px;
         border-radius: 8px;
         text-align: center;
+        max-width: 400px;
     }
 
     .return-btn {
@@ -84,6 +85,8 @@ const Dashboard = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
+        console.log("Current URL Search Params:", window.location.search);
+        
         // 1. Check for tokens or errors in URL
         const params = new URLSearchParams(window.location.search);
         const urlToken = params.get('access_token');
@@ -99,6 +102,7 @@ const Dashboard = () => {
         }
 
         if (urlToken) {
+            console.log("Token found in URL. Saving to local storage.");
             localStorage.setItem('instrumentum_token', urlToken);
             if (urlRefresh) localStorage.setItem('instrumentum_refresh', urlRefresh);
             // Clean the URL so tokens aren't visible
@@ -109,26 +113,35 @@ const Dashboard = () => {
         const token = localStorage.getItem('instrumentum_token');
 
         if (!token) {
-            navigate('/login');
-            return;
+            console.warn("No token found in storage.");
+            setError("No access token found. Please try logging in again.");
+            setLoading(false);
+            return; // Stopped the auto-redirect to see the error
         }
 
         // 3. Verify session using Authorization header instead of cookies
+        console.log("Verifying token with Directus API...");
         fetch('https://api.wade-usa.com/users/me', { 
             headers: { 'Authorization': `Bearer ${token}` } 
         })
             .then(res => {
-                if (!res.ok) throw new Error('Unauthorized');
+                if (!res.ok) {
+                    return res.text().then(text => { throw new Error(text) });
+                }
                 return res.json();
             })
             .then(result => {
+                console.log("User verified successfully.");
                 setUser(result.data);
                 setLoading(false);
             })
-            .catch(() => {
+            .catch((err) => {
+                console.error("Verification error:", err);
+                setError(`API Verification Failed: ${err.message}`);
                 localStorage.removeItem('instrumentum_token');
                 localStorage.removeItem('instrumentum_refresh');
-                navigate('/login');
+                setLoading(false);
+                // Stopped the auto-redirect here too
             });
     }, [navigate]);
 
@@ -136,7 +149,6 @@ const Dashboard = () => {
         try {
             const refreshToken = localStorage.getItem('instrumentum_refresh');
             
-            // Clean server-side logout using the explicit refresh token
             if (refreshToken) {
                 await fetch('https://api.wade-usa.com/auth/logout', {
                     method: 'POST',
@@ -147,7 +159,6 @@ const Dashboard = () => {
         } catch (err) {
             console.error("Logout network request failed:", err);
         } finally {
-            // Guarantee local cleanup and redirect
             localStorage.removeItem('instrumentum_token');
             localStorage.removeItem('instrumentum_refresh');
             navigate('/login');
@@ -159,9 +170,9 @@ const Dashboard = () => {
             <div className="loading-screen">
                 <style>{DASHBOARD_STYLES}</style>
                 <div className="error-box">
-                    <h3>{error}</h3>
-                    <p style={{ fontSize: '12px', marginTop: '10px', opacity: 0.8 }}>
-                        Check your Directus .env settings for AUTH_PROVIDERS.
+                    <h3>Error</h3>
+                    <p style={{ fontSize: '12px', marginTop: '10px', opacity: 0.8, wordWrap: 'break-word' }}>
+                        {error}
                     </p>
                 </div>
                 <button className="return-btn" onClick={() => navigate('/login')}>
