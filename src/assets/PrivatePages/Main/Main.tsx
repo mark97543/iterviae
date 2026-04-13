@@ -77,16 +77,26 @@ const Dashboard = () => {
 
     const handleLogout = async () => {
         try {
-            // For cookie-based auth, Directus reads the secure cookie automatically.
-            // Sending a JSON body causes a 400 validation error, so we send a bare POST.
-            await fetch('https://api.wade-usa.com/auth/logout', {
+            console.log("Initiating logout request to Directus...");
+            
+            const response = await fetch('https://api.wade-usa.com/auth/logout', {
                 method: 'POST',
                 credentials: 'include'
             });
+
+            if (!response.ok) {
+                // If we get a 400, parse the JSON body to see the exact Directus error
+                const errorData = await response.json().catch(() => null) || await response.text();
+                console.error(`Logout Failed! Status: ${response.status}`);
+                console.error("Directus Error Details:", JSON.stringify(errorData, null, 2));
+            } else {
+                console.log("Logout successful on server.");
+            }
         } catch (err) {
-            console.warn("Logout network request failed:", err);
+            console.error("Logout network request failed completely:", err);
         } finally {
             // Always redirect to login
+            console.log("Redirecting to login...");
             navigate('/login');
         }
     };
