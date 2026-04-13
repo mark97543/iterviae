@@ -47,24 +47,56 @@ const DASHBOARD_STYLES = `
         height: 100vh;
         width: 100vw;
         display: flex;
+        flex-direction: column;
         align-items: center;
         justify-content: center;
         background-color: #09090b;
         color: #f97316;
         font-family: monospace;
+        gap: 20px;
+    }
+
+    .error-box {
+        background: rgba(239, 68, 68, 0.1);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        color: #ef4444;
+        padding: 20px;
+        border-radius: 8px;
+        text-align: center;
+    }
+
+    .return-btn {
+        background: white;
+        color: black;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        font-weight: bold;
+        cursor: pointer;
+        text-transform: uppercase;
     }
 `;
 
 const Dashboard = () => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const navigate = useNavigate();
 
     useEffect(() => {
-        // 1. Check for tokens in URL (if redirected from Google login with mode=json)
+        // 1. Check for tokens or errors in URL
         const params = new URLSearchParams(window.location.search);
         const urlToken = params.get('access_token');
         const urlRefresh = params.get('refresh_token');
+        const urlReason = params.get('reason');
+
+        // Catch Directus OAuth errors gracefully
+        if (urlReason) {
+            setError(`Authentication Failed: ${urlReason}`);
+            setLoading(false);
+            window.history.replaceState({}, document.title, window.location.pathname);
+            return;
+        }
 
         if (urlToken) {
             localStorage.setItem('instrumentum_token', urlToken);
@@ -121,6 +153,23 @@ const Dashboard = () => {
             navigate('/login');
         }
     };
+
+    if (error) {
+        return (
+            <div className="loading-screen">
+                <style>{DASHBOARD_STYLES}</style>
+                <div className="error-box">
+                    <h3>{error}</h3>
+                    <p style={{ fontSize: '12px', marginTop: '10px', opacity: 0.8 }}>
+                        Check your Directus .env settings for AUTH_PROVIDERS.
+                    </p>
+                </div>
+                <button className="return-btn" onClick={() => navigate('/login')}>
+                    Return to Login
+                </button>
+            </div>
+        );
+    }
 
     if (loading) {
         return (
