@@ -73,8 +73,7 @@ const LOGIN_STYLES = `
 
 const Login = () => {
     const handleLogin = () => {
-        // Fixed syntax: using standard string concatenation
-        const authUrl = "https://api.wade-usa.com/auth/login/google?mode=json&redirect=" + window.location.origin + "/dashboard";
+        const authUrl = "https://api.wade-usa.com/auth/login/google?redirect=" + window.location.origin + "/dashboard";
         window.location.href = authUrl;
     };
 

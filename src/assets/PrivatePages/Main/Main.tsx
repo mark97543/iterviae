@@ -7,74 +7,39 @@ const DASHBOARD_STYLES = `
         width: 100vw;
         display: flex;
         flex-direction: column;
-        background-color: var(--color-bg);
-        color: var(--color-text);
+        background-color: #000;
+        color: #fff;
     }
-
-    .top-nav {
-        height: 60px;
-        background-color: var(--color-surface);
-        border-bottom: 1px solid var(--color-border);
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 0 var(--gap-medium);
+    .debug-panel {
+        background: #111;
+        border: 1px solid #333;
+        padding: 15px;
+        margin: 20px;
+        font-family: monospace;
+        font-size: 11px;
+        color: #666;
+        border-radius: 4px;
+        max-width: 90vw;
+        overflow-x: auto;
     }
-
-    .nav-actions {
-        display: flex;
-        align-items: center;
-        gap: var(--gap-medium);
-    }
-
-    .logout-link {
-        font-family: var(--font-main);
-        font-size: 10px;
-        color: var(--color-text);
-        cursor: pointer;
-        opacity: 0.6;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        font-weight: bold;
-    }
-
-    .logout-link:hover {
-        color: #ef4444;
-        opacity: 1;
-    }
-
-    .loading-screen {
+    .error-screen {
         height: 100vh;
-        width: 100vw;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        background-color: #09090b;
-        color: #f97316;
-        font-family: monospace;
-        gap: 20px;
-    }
-
-    .error-box {
-        background: rgba(239, 68, 68, 0.1);
-        border: 1px solid rgba(239, 68, 68, 0.3);
-        color: #ef4444;
-        padding: 20px;
-        border-radius: 8px;
         text-align: center;
-        max-width: 400px;
+        padding: 20px;
     }
-
-    .return-btn {
-        background: white;
-        color: black;
-        border: none;
+    .btn {
+        background: #f97316;
+        color: white;
         padding: 10px 20px;
+        border: none;
         border-radius: 4px;
         font-weight: bold;
         cursor: pointer;
-        text-transform: uppercase;
+        margin-top: 20px;
     }
 `;
 
@@ -85,108 +50,89 @@ const Dashboard = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        console.log("Current URL Search Params:", window.location.search);
-        
-        // 1. Check for tokens or errors in URL
-        const params = new URLSearchParams(window.location.search);
+        // DEBUG LOGS
+        const fullUrl = window.location.href;
+        const searchParams = window.location.search;
+        console.log("Full Redirect URL:", fullUrl);
+
+        const params = new URLSearchParams(searchParams);
         const urlToken = params.get('access_token');
-        const urlRefresh = params.get('refresh_token');
         const urlReason = params.get('reason');
 
-        // Catch Directus OAuth errors gracefully
         if (urlReason) {
-            setError(`Authentication Failed: ${urlReason}`);
+            setError(`Directus Error: ${urlReason}`);
             setLoading(false);
-            window.history.replaceState({}, document.title, window.location.pathname);
             return;
         }
 
-        if (urlToken) {
-            console.log("Token found in URL. Saving to local storage.");
-            localStorage.setItem('instrumentum_token', urlToken);
-            if (urlRefresh) localStorage.setItem('instrumentum_refresh', urlRefresh);
-            // Clean the URL so tokens aren't visible
+        // Clean URL to remove any residual parameters
+        if (searchParams) {
             window.history.replaceState({}, document.title, window.location.pathname);
         }
 
-        // 2. Retrieve token for session verification
-        const token = localStorage.getItem('instrumentum_token');
-
-        if (!token) {
-            console.warn("No token found in storage.");
-            setError("No access token found. Please try logging in again.");
-            setLoading(false);
-            return; // Stopped the auto-redirect to see the error
-        }
-
-        // 3. Verify session using Authorization header instead of cookies
-        console.log("Verifying token with Directus API...");
-        fetch('https://api.wade-usa.com/users/me', { 
-            headers: { 'Authorization': `Bearer ${token}` } 
-        })
-            .then(res => {
-                if (!res.ok) {
-                    return res.text().then(text => { throw new Error(text) });
-                }
-                return res.json();
+        const fetchUserAndSetState = (token) => {
+            fetch('https://api.wade-usa.com/users/me', { 
+                headers: { 'Authorization': `Bearer ${token}` } 
             })
+            .then(res => res.ok ? res.json() : Promise.reject("Token invalid or expired"))
             .then(result => {
-                console.log("User verified successfully.");
                 setUser(result.data);
+                localStorage.setItem('instrumentum_token', token);
                 setLoading(false);
             })
-            .catch((err) => {
-                console.error("Verification error:", err);
-                setError(`API Verification Failed: ${err.message}`);
+            .catch(err => {
+                setError(`API Verify Failed: ${err}`);
                 localStorage.removeItem('instrumentum_token');
-                localStorage.removeItem('instrumentum_refresh');
                 setLoading(false);
-                // Stopped the auto-redirect here too
             });
-    }, [navigate]);
+        };
 
-    const handleLogout = async () => {
-        try {
-            const refreshToken = localStorage.getItem('instrumentum_refresh');
-            
-            if (refreshToken) {
-                await fetch('https://api.wade-usa.com/auth/logout', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ refresh_token: refreshToken })
-                });
+        // Try to get a new access token using the HttpOnly directus_refresh_token cookie.
+        // We set mode: 'cookie' so Directus reads from the cookie rather than JSON body.
+        fetch('https://api.wade-usa.com/auth/refresh', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ mode: 'cookie' }),
+            credentials: 'include' // Important for cross-origin cookies
+        })
+        .then(res => res.ok ? res.json() : Promise.reject("No valid session cookie"))
+        .then(data => {
+            if (data?.data?.access_token) {
+                fetchUserAndSetState(data.data.access_token);
+            } else {
+                throw new Error("Missing access_token in response");
             }
-        } catch (err) {
-            console.error("Logout network request failed:", err);
-        } finally {
-            localStorage.removeItem('instrumentum_token');
-            localStorage.removeItem('instrumentum_refresh');
-            navigate('/login');
-        }
-    };
+        })
+        .catch(refreshErr => {
+            console.log("Refresh via cookie failed:", refreshErr);
+            // Fallback: try existing token from storage if we had one
+            const existingToken = localStorage.getItem('instrumentum_token');
+            if (existingToken) {
+                fetchUserAndSetState(existingToken);
+            } else {
+                setError("No login session found. Please login.");
+                setLoading(false);
+            }
+        });
+    }, []);
+
+    if (loading) return <div className="error-screen"><h3>LOADING...</h3></div>;
 
     if (error) {
         return (
-            <div className="loading-screen">
+            <div className="error-screen">
                 <style>{DASHBOARD_STYLES}</style>
-                <div className="error-box">
-                    <h3>Error</h3>
-                    <p style={{ fontSize: '12px', marginTop: '10px', opacity: 0.8, wordWrap: 'break-word' }}>
-                        {error}
-                    </p>
+                <h2 style={{ color: '#ef4444' }}>Auth Error</h2>
+                <p>{error}</p>
+                
+                <div className="debug-panel">
+                    <strong>DEBUG INFO:</strong><br/>
+                    URL: {window.location.origin + window.location.pathname}<br/>
+                    SEARCH: {window.location.search || "(empty)"}<br/>
+                    LOCAL_TOKEN: {localStorage.getItem('instrumentum_token') ? "Present" : "Missing"}
                 </div>
-                <button className="return-btn" onClick={() => navigate('/login')}>
-                    Return to Login
-                </button>
-            </div>
-        );
-    }
 
-    if (loading) {
-        return (
-            <div className="loading-screen">
-                <style>{DASHBOARD_STYLES}</style>
-                <h3>INITIALIZING INSTRUMENTUM...</h3>
+                <button className="btn" onClick={() => navigate('/login')}>Try Login Again</button>
             </div>
         );
     }
@@ -194,21 +140,11 @@ const Dashboard = () => {
     return (
         <div className="dashboard-container">
             <style>{DASHBOARD_STYLES}</style>
-            
-            <header className="top-nav">
-                <div style={{ color: '#f97316', fontWeight: 'bold' }}>INSTRUMENTUM</div>
-                <div className="nav-actions">
-                    <span style={{ fontSize: '12px', opacity: 0.8 }}>{user.email}</span>
-                    <div className="logout-link" onClick={handleLogout}>Logout</div>
-                </div>
-            </header>
-
-            <main style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <div style={{ textAlign: 'center' }}>
-                    <h1>Welcome, {user.first_name || 'Rider'}</h1>
-                    <p style={{ opacity: 0.5 }}>JWT Session Verified</p>
-                </div>
-            </main>
+            <div style={{ padding: '20px' }}>
+                <h1>Welcome, {user.first_name}</h1>
+                <p>Email: {user.email}</p>
+                <button className="btn" onClick={() => { localStorage.clear(); navigate('/login'); }}>Logout</button>
+            </div>
         </div>
     );
 };
