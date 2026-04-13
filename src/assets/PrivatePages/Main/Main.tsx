@@ -4,6 +4,7 @@ import './Main.css';
 import { useEffect, useState } from 'react';
 import MapComponent from './Parts/Map';
 import LeftPanel from './Parts/LeftPanel';
+import MemberPanel from './Parts/MemberPanel';
 
 
 
@@ -44,6 +45,7 @@ const Dashboard = () => {
             </div> */}
             <MapComponent waypoints={waypoints} />
             <LeftPanel />
+            <MemberPanel />
         </div>
     );
 };
