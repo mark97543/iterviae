@@ -7,7 +7,7 @@ const LeftPanel_Style = `
         transform: translateY(-50%);
         left: var(--gap-small);
         width: 300px;
-        height: 90%;
+        height: 99%;
         background-color: var(--color-bg);
         border: 1px solid var(--color-border);
         border-radius: 16px;

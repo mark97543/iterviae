@@ -134,7 +134,7 @@ const MapComponent = ({ waypoints }: { waypoints: any[] }) => {
         // Romantic Expression: Plot the path
         waypoints.forEach((point: any) => {
             if (point.longitude && point.latitude) {
-                const m = new (window as any).maplibregl.Marker({ color: '#f97316' })
+                const m = new (window as any).maplibregl.Marker({ color: '#f91616ff' })
                     .setLngLat([point.longitude, point.latitude])
                     .setPopup(new (window as any).maplibregl.Popup().setHTML(`
                         <div style="color: #000; padding: 5px;">
