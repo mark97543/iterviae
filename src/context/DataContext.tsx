@@ -2,14 +2,14 @@ import { useState, createContext, useContext } from "react";
 
 // 1. Data Structure for a Stop
 export interface Stop {
-    id: string;
-    name: string;
+    id?: string;
+    name?: string;
     address?: string;
     latitude?: number;
     longitude?: number;
     notes?: string;
-    type: 'waypoint' | 'hotel' | 'gas' | 'food' | 'attraction' | 'start' | 'end';
-    order: number;
+    type?: 'waypoint' | 'hotel' | 'gas' | 'food' | 'attraction' | 'start' | 'end';
+    order?: number;
 }
 
 // 2. Context Type
@@ -20,6 +20,8 @@ interface StopsContextType {
     setSearchStop: React.Dispatch<React.SetStateAction<{long?:any, lat?:any}>>;
     showSearchMenu: boolean;
     setShowSearchMenu: React.Dispatch<React.SetStateAction<boolean>>;
+    search: string;
+    setSearch: React.Dispatch<React.SetStateAction<string>>;
 }
 
 // 3. Create the Context
@@ -30,9 +32,10 @@ export const StopsProvider = ({ children }: { children: React.ReactNode }) => {
     const [stops, setStops] = useState<Stop[]>([]);
     const [searchStop, setSearchStop] = useState({long:null, lat:null});
     const [showSearchMenu, setShowSearchMenu] = useState(false);
+    const [search, setSearch] = useState("");
 
     return (
-        <StopsContext.Provider value={{ stops, setStops, searchStop, setSearchStop, showSearchMenu, setShowSearchMenu}}>
+        <StopsContext.Provider value={{ stops, setStops, searchStop, setSearchStop, showSearchMenu, setShowSearchMenu, search, setSearch}}>
             {children}
         </StopsContext.Provider>
     );

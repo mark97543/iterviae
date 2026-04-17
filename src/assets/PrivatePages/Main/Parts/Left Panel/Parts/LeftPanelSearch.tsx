@@ -25,8 +25,7 @@ const LEFT_PANEL_SEARCH_STYLE = `
 
 
 const LeftPanelSearch = () => {
-    const [search, setSearch] = useState("");
-    const {setSearchStop} = useStops();
+    const {setSearchStop, search, setSearch} = useStops();
 
     //Enter Key event
     const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {

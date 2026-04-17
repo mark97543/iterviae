@@ -4,6 +4,8 @@ TODO: Addd Waypoints to Map
 TODO: Be able to move Waypoints
 TODO: Add Load/Save Route
 TODO: Need the search for bar to allow adresses and search for locations
+TODO: Need to be able to drag waypoints on map
+TODO: Waypoint on left bar when clicked go to it and open info panel
 
 NEXT STEPS: 
 

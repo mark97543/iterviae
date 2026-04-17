@@ -11,7 +11,7 @@ const LEFTPANELSTOPSSTYLE=`
 `;
 
 const LeftPanelStops =()=>{
-    // const {setStops,stops}=useStops();
+    const {setStops,stops}=useStops();
 
 
 
@@ -19,8 +19,11 @@ const LeftPanelStops =()=>{
     return(
         <div className="left-panel-stops-wrapper">
             <style>{LEFTPANELSTOPSSTYLE}</style>
-            <input className="std-input" placeholder="Start"></input>
-            <input className="std-input" placeholder="End"></input>
+            {stops.map((stop: any) => (
+                <div key={stop.id}>
+                    <p>{stop.longitude.toFixed(5)}, {stop.latitude.toFixed(5)}</p>
+                </div>
+            ))}
         </div>
     )
 }

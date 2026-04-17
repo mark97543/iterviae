@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState} from "react"
+import { useEffect, useRef} from "react"
 import { useStops } from "../../../../../../context/DataContext";
 import TempMarkerWindow from "./TempMarkerWindow";
 import { createPortal } from "react-dom";
@@ -20,7 +20,7 @@ const TempMarker = ({map}: {map: any}) =>{
     useEffect(()=>{
         
         //Eixt if map is not ready or coordinated are missing
-        if(!map.current || !searchStop.long || !searchStop.lat){
+        if(!map.current || !searchStop || !searchStop.long || !searchStop.lat){
             if (searchMarker.current) searchMarker.current.remove();
             return;
         }

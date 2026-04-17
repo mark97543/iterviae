@@ -1,4 +1,5 @@
-import { useStops } from "../../../../../../context/DataContext";
+import { useStops, type Stop } from "../../../../../../context/DataContext";
+
 
 const TEMP_MARKER_WINDOW_STYLE=`
     .temp-marker-window{
@@ -64,15 +65,40 @@ const TEMP_MARKER_WINDOW_STYLE=`
         text-align: center;
     }
 
+    .add-waypoint-button{
+        width: 100%;
+        margin-top: 10px;
+}
+
 `
 
 const TempMarkerWindow = () =>{
 
-    const {searchStop, setShowSearchMenu} = useStops();
+    const {stops,setStops,searchStop, setShowSearchMenu, setSearchStop, setSearch} = useStops();
+    console.log(stops);
+
+    const addStop = () =>{
+        const newStop: Stop = {
+            id: Date.now().toString(),
+            name: "New Point",
+            address: "",
+            latitude: searchStop.lat,
+            longitude: searchStop.long,
+            type: "waypoint",
+            order: stops.length + 1
+        }
+        setStops([...stops, newStop]);
+        setSearchStop(null);
+        setShowSearchMenu(false);
+        setSearch("");
+    }
+
 
     const closeWindow = () =>{
         setShowSearchMenu(false);
     }
+
+    if (!searchStop) return null;
 
     return(
         <div className="temp-marker-window">
@@ -82,6 +108,7 @@ const TempMarkerWindow = () =>{
                 <button className="temp-marker-window-close-button" onClick={closeWindow}>X</button>
             </div>
             <h4>{searchStop.long.toFixed(5)}, {searchStop.lat.toFixed(5)}</h4>
+            <button className="std-button add-waypoint-button" onClick={addStop}>Add to Route</button>
         </div>
     )
 }
