@@ -40,7 +40,9 @@ const getTripDirections = async (stops: Stop[]) => {
         // 2. Total distance in miles
         distance: data.trip.summary.length,
         // 3. Total time in seconds
-        duration: data.trip.summary.time
+        duration: data.trip.summary.time,
+        // 4. Total time in seconds
+        legs: data.trip.legs
     }; 
 };
 

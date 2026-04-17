@@ -1,4 +1,5 @@
 import { useStops } from "../../../../../../context/DataContext";
+
 const LEFTPANELSTOPSSTYLE=`
     .left-panel-stops-wrapper{
         display: flex;
@@ -11,17 +12,26 @@ const LEFTPANELSTOPSSTYLE=`
 `;
 
 const LeftPanelStops =()=>{
-    const {stops}=useStops();
+    const {stops, route} = useStops();
 
-
+    console.log(route?.legs);
 
 
     return(
         <div className="left-panel-stops-wrapper">
             <style>{LEFTPANELSTOPSSTYLE}</style>
-            {stops.map((stop: any) => (
+            {stops.map((stop: any, index: number) => (
                 <div key={stop.id}>
-                    <p>{stop.longitude.toFixed(5)}, {stop.latitude.toFixed(5)}</p>
+                    <div>
+                        <p>{stop.longitude.toFixed(5)}, {stop.latitude.toFixed(5)}</p>
+                    </div>
+                    {/* Only show the leg stats if Valhalla returned legs, and if this isn't the final stop */}
+                    {route?.legs && index < route.legs.length && (
+                        <div>
+                            <p>{route.legs[index]?.summary?.length?.toFixed(2)} miles</p>
+                            <p>{route.legs[index]?.summary?.time} seconds</p>                        
+                        </div>
+                    )}
                 </div>
             ))}
         </div>
