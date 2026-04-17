@@ -11,7 +11,7 @@ const LEFTPANELSTOPSSTYLE=`
 `;
 
 const LeftPanelStops =()=>{
-    const {setStops,stops}=useStops();
+    const {stops}=useStops();
 
 
 

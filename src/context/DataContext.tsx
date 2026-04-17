@@ -22,6 +22,8 @@ interface StopsContextType {
     setShowSearchMenu: React.Dispatch<React.SetStateAction<boolean>>;
     search: string;
     setSearch: React.Dispatch<React.SetStateAction<string>>;
+    route: any;
+    setRoute: React.Dispatch<React.SetStateAction<any>>;
 }
 
 // 3. Create the Context
@@ -33,9 +35,22 @@ export const StopsProvider = ({ children }: { children: React.ReactNode }) => {
     const [searchStop, setSearchStop] = useState({long:null, lat:null});
     const [showSearchMenu, setShowSearchMenu] = useState(false);
     const [search, setSearch] = useState("");
+    const [route, setRoute] = useState(null);
+
 
     return (
-        <StopsContext.Provider value={{ stops, setStops, searchStop, setSearchStop, showSearchMenu, setShowSearchMenu, search, setSearch}}>
+        <StopsContext.Provider value={{ 
+            stops, 
+            setStops, 
+            searchStop, 
+            setSearchStop, 
+            showSearchMenu, 
+            setShowSearchMenu, 
+            search, 
+            setSearch,
+            route,
+            setRoute
+            }}>
             {children}
         </StopsContext.Provider>
     );

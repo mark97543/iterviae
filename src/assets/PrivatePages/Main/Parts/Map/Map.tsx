@@ -1,7 +1,7 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useStops } from '../../../../../context/DataContext';
 import TempMarker from './Temp Marker/TempMarker';
-
+import polyline from '@mapbox/polyline';
 /**
  * CLASSICAL MECHANICS: UI STYLING
  * Defining the visual boundaries of the application.
@@ -88,7 +88,8 @@ const MapComponent = () => {
     const mapContainer = useRef<HTMLDivElement>(null);
     const map = useRef<any>(null);
     const markers = useRef<any[]>([]);
-    const {stops}=useStops();
+    const [mapLoaded, setMapLoaded] = useState(false);
+    const {stops, route} = useStops();
 
 
     // SIDE EFFECT: Load External Map Assets
@@ -121,6 +122,10 @@ const MapComponent = () => {
             });
            map.current.addControl(new (window as any).maplibregl.FullscreenControl(), 'bottom-right');
            map.current.addControl(new (window as any).maplibregl.NavigationControl(), 'bottom-right');
+           
+           map.current.on('load', () => {
+               setMapLoaded(true);
+           });
         }
         document.head.appendChild(script);
 
@@ -155,6 +160,55 @@ const MapComponent = () => {
             }
         });
     }, [stops]);
+
+    // SIDE EFFECT: Draw Valhalla Route Polyline
+    useEffect(() => {
+        if (!mapLoaded || !map.current || !route || !Array.isArray(route)) return;
+
+        // Route is an array of encoded polyline shapes (one for each leg of the trip).
+        // Decode them using @mapbox/polyline (Valhalla precision is 6).
+        let allCoords: number[][] = [];
+        route.forEach((shapeStr: string) => {
+            const decoded = polyline.decode(shapeStr, 6);
+            const segmentCoords = decoded.map(([lat, lon]: number[]) => [lon, lat]);
+            allCoords = [...allCoords, ...segmentCoords];
+        });
+
+        // Push data to a GeoJSON layer on MapLibre
+        const geojsonData = {
+            type: 'Feature',
+            properties: {},
+            geometry: {
+                type: 'LineString',
+                coordinates: allCoords
+            }
+        };
+
+        if (map.current.getSource('route-source')) {
+            // If the source exists, update the data dynamically
+            map.current.getSource('route-source').setData(geojsonData);
+        } else {
+            // First time loading the route, build the source and styling
+            map.current.addSource('route-source', {
+                type: 'geojson',
+                data: geojsonData
+            });
+            map.current.addLayer({
+                id: 'route-layer',
+                type: 'line',
+                source: 'route-source',
+                layout: {
+                    'line-join': 'round',
+                    'line-cap': 'round'
+                },
+                paint: {
+                    'line-color': '#f97316', // Vibrant Iter Viae Orange
+                    'line-width': 5,
+                    'line-opacity': 0.8
+                }
+            });
+        }
+    }, [route, mapLoaded]);
 
     return (
         <div className="map-wrapper">

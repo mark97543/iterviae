@@ -1,5 +1,5 @@
 import { useStops, type Stop } from "../../../../../../context/DataContext";
-
+import { getTripDirections } from "../../../valhala";
 
 const TEMP_MARKER_WINDOW_STYLE=`
     .temp-marker-window{
@@ -74,10 +74,9 @@ const TEMP_MARKER_WINDOW_STYLE=`
 
 const TempMarkerWindow = () =>{
 
-    const {stops,setStops,searchStop, setShowSearchMenu, setSearchStop, setSearch} = useStops();
-    console.log(stops);
+    const {stops,setStops,searchStop, setShowSearchMenu, setSearchStop, setSearch, route, setRoute} = useStops();
 
-    const addStop = () =>{
+    const addStop = async () =>{
         const newStop: Stop = {
             id: Date.now().toString(),
             name: "New Point",
@@ -87,10 +86,22 @@ const TempMarkerWindow = () =>{
             type: "waypoint",
             order: stops.length + 1
         }
-        setStops([...stops, newStop]);
+        
+        // Calculate the brand new array of stops synchronously
+        const updatedStops = [...stops, newStop];
+        
+        setStops(updatedStops);
         setSearchStop(null);
         setShowSearchMenu(false);
         setSearch("");
+        setRoute(null);
+        
+        // Pass the calculated array so Valhalla sees the new stop instantly!
+        const m = await getTripDirections(updatedStops);
+        if (m) {
+            setRoute(m);
+            console.log(m);
+        }
     }
 
 

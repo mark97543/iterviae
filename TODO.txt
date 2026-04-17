@@ -11,4 +11,3 @@ NEXT STEPS:
 
 Right Click Menu on the waypoint to allow the adding of the waypoint to the route.
     - Will need a route Generator
-    - Will need a stat to handel waypoints. 
