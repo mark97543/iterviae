@@ -83,7 +83,9 @@ const MapComponent = () => {
     const mapContainer = useRef<HTMLDivElement>(null);
     const map = useRef<any>(null);
     const markers = useRef<any[]>([]);
-    const {stops}=useStops();
+    const {stops, searchStop}=useStops();
+    const searchMarker = useRef<any>(null);
+
 
     // SIDE EFFECT: Load External Map Assets
     // We dynamically inject the MapLibre CSS and JS to keep the bundle clean.
@@ -150,7 +152,30 @@ const MapComponent = () => {
         });
     }, [stops]);
 
+    //SIDE EFFECT: Display Temporary Search Point
+    useEffect(()=>{
+        //Eixt if map is not ready or coordinated are missing
+        if(!map.current || !searchStop.long || !searchStop.lat){
+            if (searchMarker.current) searchMarker.current.remove();
+            return;
+        }
+        
+        //Clear previous Temp Marker
+        if(searchMarker.current) searchMarker.current.remove();
 
+        //Create new marker
+        searchMarker.current = new (window as any).maplibregl.Marker({ color: '#f91616ff' })
+            .setLngLat([searchStop.long, searchStop.lat])
+            .addTo(map.current);
+
+        //Center map on new marker
+        map.current.flyTo({
+            center: [searchStop.long, searchStop.lat],
+            zoom: 14,
+            essential: true,
+        });
+
+    }, [searchStop]);
 
     return (
         <div className="map-wrapper">
