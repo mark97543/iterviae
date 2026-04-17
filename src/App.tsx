@@ -8,6 +8,7 @@ import { StopsProvider } from './context/DataContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import Register from './assets/PublicPages/Register/Register'
 import Pending from './assets/PublicPages/Pending/Pending'
+import MissingPage from './assets/PublicPages/404Page/MissingPage'
 
 function App() {
 
@@ -20,6 +21,7 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/pending" element={<Pending />} />
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          <Route path="*" element={<MissingPage />} />
         </Routes>
       </StopsProvider>
     </AuthProvider>
