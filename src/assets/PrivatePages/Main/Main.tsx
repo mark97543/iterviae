@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
 import './Main.css';
 import { useEffect, useState } from 'react';
-import MapComponent from './Parts/Map';
+import MapComponent from './Parts/Map/Map';
 import LeftPanel from './Parts/Left Panel/LeftPanel';
 import MemberPanel from './Parts/MemberPanel';
 

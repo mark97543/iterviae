@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
-import { useStops } from '../../../../context/DataContext';
+import { useStops } from '../../../../../context/DataContext';
+import TempMarker from './Temp Marker/TempMarker';
 
 /**
  * CLASSICAL MECHANICS: UI STYLING
@@ -71,6 +72,10 @@ const MAP_STYLES = `
         border-radius: 50%;
         display: inline-block;
         margin-right: 8px;
+    }
+
+    .maplibregl-marker {
+        cursor: pointer;
     }
 `;
 
@@ -152,35 +157,38 @@ const MapComponent = () => {
         });
     }, [stops]);
 
-    //SIDE EFFECT: Display Temporary Search Point
-    useEffect(()=>{
-        //Eixt if map is not ready or coordinated are missing
-        if(!map.current || !searchStop.long || !searchStop.lat){
-            if (searchMarker.current) searchMarker.current.remove();
-            return;
-        }
+    // //SIDE EFFECT: Display Temporary Search Point
+    // useEffect(()=>{
+    //     //Eixt if map is not ready or coordinated are missing
+    //     if(!map.current || !searchStop.long || !searchStop.lat){
+    //         if (searchMarker.current) searchMarker.current.remove();
+    //         return;
+    //     }
         
-        //Clear previous Temp Marker
-        if(searchMarker.current) searchMarker.current.remove();
+    //     //Clear previous Temp Marker
+    //     if(searchMarker.current) searchMarker.current.remove();
 
-        //Create new marker
-        searchMarker.current = new (window as any).maplibregl.Marker({ color: '#f91616ff' })
-            .setLngLat([searchStop.long, searchStop.lat])
-            .addTo(map.current);
+    //     //Create new marker
+    //     searchMarker.current = new (window as any).maplibregl.Marker({ color: '#f91616ff' })
+    //         .setLngLat([searchStop.long, searchStop.lat])
+    //         .addTo(map.current);
 
-        //Center map on new marker
-        map.current.flyTo({
-            center: [searchStop.long, searchStop.lat],
-            zoom: 14,
-            essential: true,
-        });
+        
 
-    }, [searchStop]);
+    //     //Center map on new marker
+    //     map.current.flyTo({
+    //         center: [searchStop.long, searchStop.lat],
+    //         zoom: 14,
+    //         essential: true,
+    //     });
+
+    // }, [searchStop]);
 
     return (
         <div className="map-wrapper">
             <style>{MAP_STYLES}</style>
             <div id="map-container" ref={mapContainer} />
+            <TempMarker map={map} />
         </div>
     );
 }
