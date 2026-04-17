@@ -163,12 +163,12 @@ const MapComponent = () => {
 
     // SIDE EFFECT: Draw Valhalla Route Polyline
     useEffect(() => {
-        if (!mapLoaded || !map.current || !route || !Array.isArray(route)) return;
+        if (!mapLoaded || !map.current || !route || !route.shapes || !Array.isArray(route.shapes)) return;
 
         // Route is an array of encoded polyline shapes (one for each leg of the trip).
         // Decode them using @mapbox/polyline (Valhalla precision is 6).
         let allCoords: number[][] = [];
-        route.forEach((shapeStr: string) => {
+        route.shapes.forEach((shapeStr: string) => {
             const decoded = polyline.decode(shapeStr, 6);
             const segmentCoords = decoded.map(([lat, lon]: number[]) => [lon, lat]);
             allCoords = [...allCoords, ...segmentCoords];
@@ -202,7 +202,7 @@ const MapComponent = () => {
                     'line-cap': 'round'
                 },
                 paint: {
-                    'line-color': '#f97316', // Vibrant Iter Viae Orange
+                    'line-color': '#0d4a7cff', // Vibrant Iter Viae Orange
                     'line-width': 5,
                     'line-opacity': 0.8
                 }

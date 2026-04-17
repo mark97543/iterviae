@@ -22,6 +22,7 @@ const TempMarker = ({map}: {map: any}) =>{
         //Eixt if map is not ready or coordinated are missing
         if(!map.current || !searchStop || !searchStop.long || !searchStop.lat){
             if (searchMarker.current) searchMarker.current.remove();
+            if (popupRef.current) popupRef.current.remove();
             return;
         }
         

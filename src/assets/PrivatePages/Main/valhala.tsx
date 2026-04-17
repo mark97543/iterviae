@@ -32,9 +32,16 @@ const getTripDirections = async (stops: Stop[]) => {
 
     // 3. Valhalla returns an array of 'legs' (one for each segment between points)
     // We extract all shapes to create one continuous line
-    const fullShape = data.trip.legs.map((leg: any) => leg.shape);
+    // const fullShape = data.trip.legs.map((leg: any) => leg.shape);
     
-    return fullShape; 
+    return {
+        // 1. Array of shapes (same as before)
+        shapes: data.trip.legs.map((leg: any) => leg.shape),
+        // 2. Total distance in miles
+        distance: data.trip.summary.length,
+        // 3. Total time in seconds
+        duration: data.trip.summary.time
+    }; 
 };
 
 export {getTripDirections};

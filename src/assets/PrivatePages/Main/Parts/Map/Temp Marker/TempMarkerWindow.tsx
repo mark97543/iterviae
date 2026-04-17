@@ -100,7 +100,7 @@ const TempMarkerWindow = () =>{
         const m = await getTripDirections(updatedStops);
         if (m) {
             setRoute(m);
-            console.log(m);
+            //console.log(m);
         }
     }
 
