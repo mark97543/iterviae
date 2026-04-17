@@ -8,3 +8,6 @@ TODO: Search For Bar.
 
 Tommarrow we will work on the left sidebar. It will have waypoints loaded to map and scroll in the y direction when overflowed
 Id will also have the directions. 
+
+Need to make dummy data, 
+Need to map through data

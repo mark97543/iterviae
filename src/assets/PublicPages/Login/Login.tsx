@@ -110,6 +110,11 @@ const LOGIN_STYLES = `
         font-size: 0.8rem;
         margin: 0;
     }
+
+    .register-link {
+        color: var(--color-accent, #f97316);
+        text-decoration: none;
+}
 `;
 
 const Login = () => {
@@ -129,7 +134,7 @@ const Login = () => {
             await login(email, password);
             navigate('/dashboard');
         } catch (err: any) {
-            setError(err.message || 'Login failed. Please try again.');
+            setError(err.message + "\n If you have a account that is pending verification, please contact an administrator.");
         } finally {
             setLoading(false);
         }
@@ -169,6 +174,8 @@ const Login = () => {
                 <button type="submit" className="google-btn" disabled={loading}>
                     {loading ? 'Authenticating...' : 'Login'}
                 </button>
+
+                <span>Don't have an account? <a className='register-link' href="/register">Register</a></span>
             </form>
         </div>
     );

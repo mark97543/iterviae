@@ -11,6 +11,7 @@ interface AuthContextType {
     loading: boolean;
     error: string | null;
     login: (email: string, password: string) => Promise<void>;
+    register: (first_name: string, email: string, password: string) => Promise<void>;
     logout: () => void;
 }
 
@@ -120,6 +121,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
     };
 
+    const register = async (first_name: string, email: string, password: string): Promise<void> => {
+        setError(null);
+        setLoading(true);
+        try {
+            // Directus standard user creation endpoint (requires Public 'create' permission on directus_users)
+            const res = await fetch('https://api.wade-usa.com/users', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    first_name, 
+                    email, 
+                    password,
+                    role: '3ae1aaa8-966b-4022-a39f-e5abe29b57b3',
+                    status: 'unverified'
+                })
+            });
+            
+            if (!res.ok) {
+                const errData = await res.json();
+                throw new Error(errData?.errors?.[0]?.message || 'Failed to register. Ensure public registration is enabled.');
+            }
+
+            // We do not auto-login because the user is unverified. 
+            // The frontend will handle redirecting to the /pending page.
+        } catch (err: any) {
+            setError(err.message || "An error occurred during registration");
+            setLoading(false);
+            throw err;
+        }
+    };
+
     const logout = () => {
         sessionStorage.clear();
         setUser(null);
@@ -128,7 +160,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     return (
-        <AuthContext.Provider value={{ user, loading, error, login, logout }}>
+        <AuthContext.Provider value={{ user, loading, error, login, register, logout }}>
             {children}
         </AuthContext.Provider>
     );

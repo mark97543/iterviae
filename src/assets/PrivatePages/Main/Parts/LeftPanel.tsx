@@ -1,3 +1,4 @@
+import LeftPanelStops from "./LeftPanelStops";
 
 const LeftPanel_Style = `
 
@@ -26,7 +27,7 @@ const LeftPanel = () =>{
     return(
         <div className="left-panel-wrapper">
             <style>{LeftPanel_Style}</style>          
-            <h1>LP Panel </h1>
+            <LeftPanelStops/>
         </div>
     )
 }

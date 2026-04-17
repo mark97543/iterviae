@@ -8,31 +8,10 @@ import MemberPanel from './Parts/MemberPanel';
 
 
 
+
 const Dashboard = () => {
-    const { user, logout } = useAuth();
-    const navigate = useNavigate();
-    const [waypoints, setWaypoints] = useState([]);
+    const { user } = useAuth();
 
-    useEffect(()=>{
-        setWaypoints([
-        {
-            name: 'Boise',
-            longitude: -114.35,
-            latitude: 43.5,
-        },
-        {
-            name: 'Salt Lake City',
-            longitude: -111.89,
-            latitude: 40.76,
-        }
-    ]);
-    },[])
-
-
-    // const handleLogout = () => {
-    //     logout();
-    //     navigate('/login');
-    // };
 
     if (!user) return null; // Component should not render if not authenticated; ProtectedRoute will catch it
 
@@ -43,7 +22,7 @@ const Dashboard = () => {
                 <p>Email: {user.email}</p>
                 <button className="btn" onClick={handleLogout}>Logout</button>
             </div> */}
-            <MapComponent waypoints={waypoints} />
+            <MapComponent />
             <LeftPanel />
             <MemberPanel />
         </div>

@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { useStops } from '../../../../context/DataContext';
 
 /**
  * CLASSICAL MECHANICS: UI STYLING
@@ -78,10 +79,11 @@ const MAP_STYLES = `
  * This internal component handles the MapLibre engine.
  * It translates the "Classical" data from the database into the "Romantic" visual map.
  */
-const MapComponent = ({ waypoints }: { waypoints: any[] }) => {
+const MapComponent = () => {
     const mapContainer = useRef<HTMLDivElement>(null);
     const map = useRef<any>(null);
     const markers = useRef<any[]>([]);
+    const {stops}=useStops();
 
     // SIDE EFFECT: Load External Map Assets
     // We dynamically inject the MapLibre CSS and JS to keep the bundle clean.
@@ -132,7 +134,7 @@ const MapComponent = ({ waypoints }: { waypoints: any[] }) => {
         markers.current = [];
 
         // Romantic Expression: Plot the path
-        waypoints.forEach((point: any) => {
+        stops.forEach((point: any) => {
             if (point.longitude && point.latitude) {
                 const m = new (window as any).maplibregl.Marker({ color: '#f91616ff' })
                     .setLngLat([point.longitude, point.latitude])
@@ -146,7 +148,7 @@ const MapComponent = ({ waypoints }: { waypoints: any[] }) => {
                 markers.current.push(m);
             }
         });
-    }, [waypoints]);
+    }, [stops]);
 
 
 
