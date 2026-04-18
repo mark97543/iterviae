@@ -1,10 +1,11 @@
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
 import './Main.css';
-import { useEffect, useState } from 'react';
+// import { useEffect, useState } from 'react';
 import MapComponent from './Parts/Map/Map';
 import LeftPanel from './Parts/Left Panel/LeftPanel';
-import MemberPanel from './Parts/MemberPanel';
+import MemberPanel from './Parts/MemberPanel/MemberPanel';
+import BottomPanel from './Parts/BottomPanel/BottomPanel';
 
 
 
@@ -17,14 +18,10 @@ const Dashboard = () => {
 
     return (
         <div className="dashboard-container">
-            {/* <div style={{ padding: '20px' }}>
-                <h1>Welcome, {user.first_name}</h1>
-                <p>Email: {user.email}</p>
-                <button className="btn" onClick={handleLogout}>Logout</button>
-            </div> */}
             <MapComponent />
             <LeftPanel />
             <MemberPanel />
+            <BottomPanel />
         </div>
     );
 };

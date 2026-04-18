@@ -9,20 +9,23 @@ import ProtectedRoute from './components/ProtectedRoute'
 import Register from './assets/PublicPages/Register/Register'
 import Pending from './assets/PublicPages/Pending/Pending'
 import MissingPage from './assets/PublicPages/404Page/MissingPage'
+import { DirectusProvider } from './context/DirectusContext'
 
 function App() {
 
   return (
     <AuthProvider>
       <StopsProvider>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/pending" element={<Pending />} />
-          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-          <Route path="*" element={<MissingPage />} />
-        </Routes>
+        <DirectusProvider>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/pending" element={<Pending />} />
+            <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            <Route path="*" element={<MissingPage />} />
+          </Routes>
+        </DirectusProvider>
       </StopsProvider>
     </AuthProvider>
   )

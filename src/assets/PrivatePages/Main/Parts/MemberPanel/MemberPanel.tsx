@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../../../context/AuthContext';
+import { useAuth } from '../../../../../context/AuthContext';
 
 const MemberPanel_Style = `
 
@@ -46,7 +46,7 @@ const MemberPanel_Style = `
 `;
 
 const MemberPanel = () =>{
-    const {logout } = useAuth();
+    const {logout, user } = useAuth();
     const navigate = useNavigate();
     
     const handleLogout = () => {
@@ -57,7 +57,7 @@ const MemberPanel = () =>{
     return(
         <div className="member-panel-wrapper">
             <style>{MemberPanel_Style}</style>
-            <p>Member Panel</p>
+            <p>Welcome, {user.first_name}</p>
             {/* Add logout function here */}
             <button className='logout-btn std-button' onClick={handleLogout}><img src="/logout.png" alt="logout" /></button>
         </div>

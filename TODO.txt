@@ -1,15 +1,18 @@
 TODO: Right Click Menu
 TODO: Custom Waypoint Markers. 
-TODO: Addd Waypoints to Map
 TODO: Be able to move Waypoints
-TODO: Add Load/Save Route
+***********TODO: Add Load/Save Route
 TODO: Need the search for bar to allow adresses and search for locations
-TODO: Need to be able to drag waypoints on map
+***********TODO: Need to be able to drag waypoints on map
 TODO: Waypoint on left bar when clicked go to it and open info panel
 TODO: Add Setting to change colors for routes 
 TODO: Change Marker Color and Shape
+TODO: Need a mobile view
+TODO: Need a Tablet View
 
 NEXT STEPS: 
 
-Right Click Menu on the waypoint to allow the adding of the waypoint to the route.
-    - Will need a route Generator
+Need to load trip, create trip .. . 
+- Will be another window similart to previsou iter viae route planner. 
+- Modal for new trip 
+- Put the trip name on left bar

@@ -1,4 +1,5 @@
-import { useState, createContext, useContext } from "react";
+import { useState, createContext, useContext, useEffect } from "react";
+import { useAuth } from "./AuthContext";
 
 // 1. Data Structure for a Stop
 export interface Stop {
@@ -11,6 +12,8 @@ export interface Stop {
     type?: 'waypoint' | 'hotel' | 'gas' | 'food' | 'attraction' | 'start' | 'end';
     order?: number;
 }
+
+
 
 // 2. Context Type
 interface StopsContextType {
@@ -31,11 +34,25 @@ export const StopsContext = createContext<StopsContextType | null>(null);
 
 // 4. Create the Provider Component
 export const StopsProvider = ({ children }: { children: React.ReactNode }) => {
-    const [stops, setStops] = useState<Stop[]>([]);
-    const [searchStop, setSearchStop] = useState({long:null, lat:null});
-    const [showSearchMenu, setShowSearchMenu] = useState(false);
-    const [search, setSearch] = useState("");
-    const [route, setRoute] = useState(null);
+    const [stops, setStops] = useState<Stop[]>([]); //The stops for the current trip 
+    const [searchStop, setSearchStop] = useState({long:null, lat:null}); // The stop that is being searched for 
+    const [showSearchMenu, setShowSearchMenu] = useState(false); // Whether the search menu is open 
+    const [search, setSearch] = useState(""); // The search term for waypoints
+    const [route, setRoute] = useState(null); // The route for the current trip 
+ 
+
+    const { user } = useAuth();
+
+    // SIDE EFFECT: Wipe all mapping data out of memory on Logout
+    useEffect(() => {
+        if (!user) {
+            setStops([]);
+            setSearchStop({long:null, lat:null});
+            setShowSearchMenu(false);
+            setSearch("");
+            setRoute(null);
+        }
+    }, [user]);
 
 
     return (

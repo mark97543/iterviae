@@ -24,8 +24,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const checkTokenAndFetchUser = async (token: string): Promise<boolean> => {
         try {
-            const res = await fetch('https://api.wade-usa.com/users/me', {
-                headers: { 'Authorization': `Bearer ${token}` }
+            const res = await fetch('https://api.wade-usa.com/users/me?fields=*', {
+                headers: { 'Authorization': `Bearer ${token}` },
+                cache: 'no-store'
             });
             if (!res.ok) return false;
             const result = await res.json();
