@@ -1,4 +1,6 @@
 import React from 'react'
+import { useState } from 'react';
+import { useDirectus } from '../../../../../../context/DirectusContext';
 
 const NEW_TRIP_MODAL_STYLE = `
     .new-trip-modal-overlay-transparent {
@@ -52,21 +54,54 @@ const NEW_TRIP_MODAL_STYLE = `
         font-size: 1.5rem;
         cursor: pointer;
     }
+
+    .new-trip-create-btn{
+        margin-top: var(--gap-small);
+        align-self: center;
+        width: 100%;
+    }
 `;
 
 const NewTripModal = ({setModal}: {setModal: (show: boolean) => void}) => {
-  return (
-    <>
-        <style>{NEW_TRIP_MODAL_STYLE}</style>
-        {/* Invisible overlay to catch clicks outside the menu */}
-        <div className="new-trip-modal-overlay-transparent" onClick={() => setModal(false)}></div>
-        
-        <div className="new-trip-modal-wrapper" onClick={(e) => e.stopPropagation()}>
-            <button className="close-modal-btn" onClick={() => setModal(false)}>&times;</button>
-            <p>New Trip</p>
-        </div>
-    </>
-  )
+    const [tempTitle, setTempTitle] = useState("");
+    const {saveTrip, setCurrentTrip} = useDirectus();
+
+
+    const SaveNewTrip = async () =>{
+        if(tempTitle === null || tempTitle === ""){
+            alert("Please enter a trip name");
+            return;
+        }
+        const result = await saveTrip(tempTitle);
+        if(result){
+            setCurrentTrip({trip_name: tempTitle});
+            setModal(false);
+        }
+    }
+
+    return (
+        <>
+            <style>{NEW_TRIP_MODAL_STYLE}</style>
+            {/* Invisible overlay to catch clicks outside the menu */}
+            <div className="new-trip-modal-overlay-transparent" onClick={() => setModal(false)}></div>
+            
+            <div className="new-trip-modal-wrapper" onClick={(e) => e.stopPropagation()}>
+                <button className="close-modal-btn" onClick={() => setModal(false)}>&times;</button>
+                <p>New Trip Details</p>
+                <input 
+                    className="std-input" 
+                    type="text" 
+                    placeholder="Trip Name" 
+                    value={tempTitle} 
+                    onChange={(e) => setTempTitle(e.target.value)}
+                />
+
+                <button className="std-button new-trip-create-btn" onClick={SaveNewTrip}>
+                    Create
+                </button>
+            </div>
+        </>
+    )
 }
 
 export default NewTripModal;
