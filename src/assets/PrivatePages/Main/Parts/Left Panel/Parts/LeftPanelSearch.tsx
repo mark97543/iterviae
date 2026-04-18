@@ -1,10 +1,10 @@
 import { useStops } from "../../../../../../context/DataContext";
-
+import { useDirectus } from "../../../../../../context/DirectusContext";
 
 const LEFT_PANEL_SEARCH_STYLE = `
     .left-panel-search-wrapper{
         display: flex;
-        flex-direction: row;
+        flex-direction: column;
         justify-content: space-between;
         align-items: center;
         margin-bottom: var(--gap-medium);
@@ -20,11 +20,29 @@ const LEFT_PANEL_SEARCH_STYLE = `
         margin-left: var(--gap-xsmall);
     }
 
+    .left-panel-search-bar{
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: var(--gap-medium);
+        margin-top:var(--gap-small);
+    }
+
+    .left-bar-title{
+        width:250px;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        text-align: center;
+    }
+
 `;
 
 
 const LeftPanelSearch = () => {
     const {setSearchStop, search, setSearch} = useStops();
+    const{currentTrip} = useDirectus();
 
     //Enter Key event
     const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -42,16 +60,19 @@ const LeftPanelSearch = () => {
     return(        
         <div className="left-panel-search-wrapper">
             <style>{LEFT_PANEL_SEARCH_STYLE}</style>
-            <input 
-                className="std-input" 
-                type="text" 
-                onFocus={(e) => e.target.select()} 
-                placeholder="Search for location" 
-                value={search} 
-                onChange={(e) => setSearch(e.target.value)}
-                onKeyDown={handleKeyDown}    
-            /> 
-            <button className="std-button panel-search-button" onClick={handleSearch}><img src="./search.png" alt="Search" /></button>
+            <h4 className="left-bar-title">{currentTrip?.trip_name || "Create or Load Trip"}</h4>
+            <div className="left-panel-search-bar">
+                <input 
+                    className="std-input" 
+                    type="text" 
+                    onFocus={(e) => e.target.select()} 
+                    placeholder="Search for location" 
+                    value={search} 
+                    onChange={(e) => setSearch(e.target.value)}
+                    onKeyDown={handleKeyDown}    
+                /> 
+                <button className="std-button panel-search-button" onClick={handleSearch}><img src="./search.png" alt="Search" /></button>
+            </div>
         </div>     
     )
 }

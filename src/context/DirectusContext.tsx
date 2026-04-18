@@ -1,6 +1,6 @@
 //Build basic Context here to call the Directus Database
 
-import { createContext, useState } from 'react';
+import { createContext, useContext, useState } from 'react';
 // import { useAuth } from './AuthContext';
 // import { type Stop } from './DataContext';
 
@@ -8,12 +8,13 @@ import { createContext, useState } from 'react';
 // ** New Interface for Trips **
 export interface Trip {
     id?: string;
-    name?: string;
-
+    trip_name?: string; 
 }
 
 
-export const DirectusContext = createContext(null);
+export const DirectusContext = createContext<any>(null);
+
+export const useDirectus = () => useContext(DirectusContext);
 
 export const DirectusProvider = ({ children }: { children: React.ReactNode }) => {
     const [directus, setDirectus] = useState(null);

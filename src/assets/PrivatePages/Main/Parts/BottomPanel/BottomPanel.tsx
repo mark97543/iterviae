@@ -1,3 +1,6 @@
+import Tippy from '@tippyjs/react';
+import 'tippy.js/dist/tippy.css';
+
 
 const BOTTOM_PANEL_STYLE=`
     .bottom-panel-wrapper{
@@ -31,9 +34,11 @@ const BottomPanel = () => {
     return(
         <div className="bottom-panel-wrapper">
             <style>{BOTTOM_PANEL_STYLE}</style>
-            <button className="std-button new-trip-btn">
-                <img src="./new.png"/>
-            </button>
+            <Tippy content="New Trip">
+                <button className="std-button new-trip-btn">
+                    <img src="./new.png"/>
+                </button>
+            </Tippy>
         </div>
     )
 }
