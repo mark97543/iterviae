@@ -72,10 +72,11 @@ const NewTripModal = ({setModal}: {setModal: (show: boolean) => void}) => {
             alert("Please enter a trip name");
             return;
         }
-        const result = await saveTrip(tempTitle);
-        if(result){
-            setCurrentTrip({trip_name: tempTitle});
+        const newTrip = await saveTrip(tempTitle);
+        if(newTrip){
+            setCurrentTrip(newTrip);
             setModal(false);
+            console.log("New Trip: ", newTrip);
         }
     }
 

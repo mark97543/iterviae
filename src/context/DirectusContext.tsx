@@ -38,15 +38,16 @@ export const DirectusProvider = ({ children }: { children: React.ReactNode }) =>
             
             if(result.status === 200){
                 console.log("Trip Saved Successfully");
-                setTrips([...trips, result.data.data]);
-                return true;
+                const newTrip = result.data.data;
+                setTrips([...trips, newTrip]);
+                return newTrip;
             } else {
                 console.log("Error Saving Trip");
-                return false;
+                return null;
             }
         } catch (error) {
             console.error("Failed to save trip:", error);
-            return false;
+            return null;
         }
     }
 
