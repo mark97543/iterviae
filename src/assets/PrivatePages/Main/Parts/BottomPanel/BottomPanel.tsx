@@ -1,6 +1,7 @@
 import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
-
+import NewTripModal from './Parts/NewTripModal';
+import {useState} from 'react';
 
 const BOTTOM_PANEL_STYLE=`
     .bottom-panel-wrapper{
@@ -31,11 +32,22 @@ const BOTTOM_PANEL_STYLE=`
 `;
 
 const BottomPanel = () => {
+    const [showNewTripModal, setShowNewTripModal] = useState(false);
+
+    
+
+
+
+
+
     return(
         <div className="bottom-panel-wrapper">
             <style>{BOTTOM_PANEL_STYLE}</style>
+            
+            {showNewTripModal && <NewTripModal setModal={setShowNewTripModal}/>}
+
             <Tippy content="New Trip">
-                <button className="std-button new-trip-btn">
+                <button className="std-button new-trip-btn" onClick={() => setShowNewTripModal(!showNewTripModal)}>
                     <img src="./new.png"/>
                 </button>
             </Tippy>
