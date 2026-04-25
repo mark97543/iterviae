@@ -23,7 +23,7 @@ const LeftPanelStops =()=>{
             {stops.map((stop: any, index: number) => (
                 <div key={stop.id}>
                     <div>
-                        <p>{stop.longitude.toFixed(5)}, {stop.latitude.toFixed(5)}</p>
+                        <p>{Number(stop.longitude).toFixed(5)}, {Number(stop.latitude).toFixed(5)}</p>
                     </div>
                     {/* Only show the leg stats if Valhalla returned legs, and if this isn't the final stop */}
                     {route?.legs && index < route.legs.length && (

@@ -59,6 +59,7 @@ export const DirectusProvider = ({ children }: { children: React.ReactNode }) =>
 
             const result = await axios.get(`https://api.wade-usa.com/items/trip`, {
                 params: {
+                    fields: 'id,trip_name',
                     filter: {
                         user_created: {
                             _eq: user.id
@@ -85,7 +86,40 @@ export const DirectusProvider = ({ children }: { children: React.ReactNode }) =>
         }
     }
 
-    
+    //Load data by selected trip ID
+    const loadTripData = async (tripId: string) => {
+        try {
+            const token = sessionStorage.getItem('instrumentum_token');
+            if (!token || !tripId) return null;
+
+            const result = await axios.get(`https://api.wade-usa.com/items/trip`, {
+                params: {
+                    fields: 'id,trip_name,stop.sort, stop.name, stop.longitude, stop.latitude',
+                    filter: {
+                        id: {
+                            _eq: tripId
+                        }
+                    }
+                },
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            
+            if(result.status === 200){
+                // console.log("Trip Data Loaded Successfully", result.data.data[0].stop);
+                const loadedTripData = result.data.data[0];
+                setCurrentTrip(loadedTripData);
+                return loadedTripData;
+            } else {
+                console.log("Error Loading Trip Data");
+                return null;
+            }
+        } catch (error) {
+            console.error("Failed to load trip data:", error);
+            return null;
+        }
+    }
 
 
     return (
@@ -97,7 +131,8 @@ export const DirectusProvider = ({ children }: { children: React.ReactNode }) =>
             setTrips, 
             setCurrentTrip,
             saveTrip,
-            loadTrips
+            loadTrips,
+            loadTripData
         }}>
             {children}
         </DirectusContext.Provider>
