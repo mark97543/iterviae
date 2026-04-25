@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useStops } from "../../../../../../context/DataContext";
 
 const MARKER_POPUP_STYLE=`
@@ -95,6 +96,25 @@ const MARKER_POPUP_STYLE=`
 
 const MarkerPopup = ({ point, stops, setStops, editMode }: { point: any, stops: any[], setStops: any, editMode: boolean }) =>{
 
+    const [coordsText, setCoordsText] = useState(`${point.latitude}, ${point.longitude}`);
+
+    const handleCoordsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const val = e.target.value;
+        setCoordsText(val); // Update UI text instantly
+
+        // Only parse and update map data if it looks like a valid pair
+        const parts = val.split(',');
+        if (parts.length >= 2) {
+            const lat = parseFloat(parts[0].trim());
+            const lng = parseFloat(parts[1].trim());
+            if (!isNaN(lat) && !isNaN(lng)) {
+                setStops(stops.map((s: any) => s.id === point.id ? { ...s, latitude: lat, longitude: lng } : s));
+            }
+        }
+    }
+
+
+
     return(
         <div className="marker-popup-wrapper">
             <style>{MARKER_POPUP_STYLE}</style>
@@ -109,17 +129,14 @@ const MarkerPopup = ({ point, stops, setStops, editMode }: { point: any, stops: 
                         onChange={(e) => setStops(stops.map((s: any) => s.id === point.id ? { ...s, name: e.target.value } : s))} 
                     />
 
-                    <span className="input-label">Coordinates</span>
+                    <span className="input-label">Coordinates (Lat, Long)</span>
                     <input 
                         className="input-dark" 
                         type="text" 
-                        value={`${Number(point.latitude).toFixed(5)}, ${Number(point.longitude).toFixed(5)}`} 
-                        disabled
-                        style={{opacity: 0.5, cursor: 'not-allowed'}}
-                        title="Coordinates cannot be manually edited here."
+                        value={coordsText} 
+                        placeholder="e.g. 38.8951, -77.0369"
+                        onChange={handleCoordsChange}
                     />
-
-                    
                     <span className="input-label" style={{marginTop: '4px'}}>Notes</span>
                     <textarea 
                         className="input-dark" 

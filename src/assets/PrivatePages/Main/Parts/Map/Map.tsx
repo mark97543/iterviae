@@ -4,6 +4,7 @@ import { useStops } from '../../../../../context/DataContext';
 import TempMarker from './Temp Marker/TempMarker';
 import polyline from '@mapbox/polyline';
 import MarkerPopup from './MarkerPopup/MarkerPopup';
+import { getTripDirections } from '../../valhala';
 /**
  * CLASSICAL MECHANICS: UI STYLING
  * Defining the visual boundaries of the application.
@@ -91,7 +92,7 @@ const MapComponent = () => {
     const map = useRef<any>(null);
     const markerRoots = useRef<Map<string, any>>(new Map());
     const [mapLoaded, setMapLoaded] = useState(false);
-    const {stops, route, setStops, editMode} = useStops();
+    const {stops, route, setStops, editMode, setRoute} = useStops();
 
 
     // SIDE EFFECT: Load External Map Assets
@@ -136,6 +137,23 @@ const MapComponent = () => {
         }
 
     },[])
+
+    // SIDE EFFECT: Fetch Valhalla Route
+    // We debounce this so we don't spam the API while the user is typing coordinates
+    useEffect(() => {
+        if (!stops || stops.length < 2) return;
+        
+        const timer = setTimeout(async () => {
+            try {
+                const newRoute = await getTripDirections(stops);
+                if (newRoute) setRoute(newRoute);
+            } catch (err) {
+                console.error("Failed to fetch route:", err);
+            }
+        }, 1000); // 1 second debounce
+        
+        return () => clearTimeout(timer);
+    }, [stops, setRoute]);
 
     // SIDE EFFECT: Sync Markers with Directus Data
     useEffect(()=>{
