@@ -60,7 +60,7 @@ const LeftPanelSearch = () => {
     return(        
         <div className="left-panel-search-wrapper">
             <style>{LEFT_PANEL_SEARCH_STYLE}</style>
-            <h4 className="left-bar-title">{currentTrip?.trip_name || "Create or Load Trip"}</h4>
+            {/* <h4 className="left-bar-title">{currentTrip?.trip_name || "Create or Load Trip"}</h4> */}
             <div className="left-panel-search-bar">
                 <input 
                     className="std-input" 

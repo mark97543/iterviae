@@ -34,6 +34,8 @@ interface StopsContextType {
     setRoute: React.Dispatch<React.SetStateAction<any>>;
     selectedTrip: string;
     setSelectedTrip: React.Dispatch<React.SetStateAction<string>>;
+    editMode: boolean;
+    setEditMode: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 // 3. Create the Context
@@ -47,6 +49,7 @@ export const StopsProvider = ({ children }: { children: React.ReactNode }) => {
     const [search, setSearch] = useState(""); // The search term for waypoints
     const [route, setRoute] = useState(null); // The route for the current trip 
     const [selectedTrip, setSelectedTrip] = useState(""); // The selected trip to load this is the trip ID
+    const [editMode,setEditMode]=useState(false) // Whether the trip is in edit mode 
     const { user } = useAuth();
 
     // SIDE EFFECT: Wipe all mapping data out of memory on Logout
@@ -75,7 +78,9 @@ export const StopsProvider = ({ children }: { children: React.ReactNode }) => {
             route,
             setRoute,
             selectedTrip,
-            setSelectedTrip
+            setSelectedTrip,
+            editMode,
+            setEditMode
             }}>
             {children}
         </StopsContext.Provider>

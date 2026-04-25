@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
+import { createRoot } from 'react-dom/client';
 import { useStops } from '../../../../../context/DataContext';
 import TempMarker from './Temp Marker/TempMarker';
 import polyline from '@mapbox/polyline';
+import MarkerPopup from './MarkerPopup/MarkerPopup';
 /**
  * CLASSICAL MECHANICS: UI STYLING
  * Defining the visual boundaries of the application.
@@ -87,9 +89,9 @@ const MAP_STYLES = `
 const MapComponent = () => {
     const mapContainer = useRef<HTMLDivElement>(null);
     const map = useRef<any>(null);
-    const markers = useRef<any[]>([]);
+    const markerRoots = useRef<Map<string, any>>(new Map());
     const [mapLoaded, setMapLoaded] = useState(false);
-    const {stops, route} = useStops();
+    const {stops, route, setStops, editMode} = useStops();
 
 
     // SIDE EFFECT: Load External Map Assets
@@ -136,30 +138,42 @@ const MapComponent = () => {
     },[])
 
     // SIDE EFFECT: Sync Markers with Directus Data
-    // Whenever 'waypoints' change, we clear the old world and render the new one
     useEffect(()=>{
         if(!map.current || !(window as any).maplibregl) return;
 
-        // Classical Maintenance: Clear existing markers to prevent memory leaks
-        markers.current.forEach((marker: any) => marker.remove());
-        markers.current = [];
+        const currentStopIds = new Set(stops.map((s: any) => s.id));
 
-        // Romantic Expression: Plot the path
+        // 1. Remove markers that no longer exist in the stops array
+        for (const [id, data] of markerRoots.current.entries()) {
+            if (!currentStopIds.has(id)) {
+                data.marker.remove();
+                setTimeout(() => data.root.unmount(), 0); // Safely unmount React tree
+                markerRoots.current.delete(id);
+            }
+        }
+
+        // 2. Create new markers or update existing ones
         stops.forEach((point: any) => {
             if (point.longitude && point.latitude) {
-                const m = new (window as any).maplibregl.Marker({ color: '#000000ff' })
-                    .setLngLat([point.longitude, point.latitude])
-                    .setPopup(new (window as any).maplibregl.Popup().setHTML(`
-                        <div style="color: #000; padding: 5px;">
-                            <h4 style="margin: 0;">${point.name || 'Waypoint'}</h4>
-                            <p style="margin: 5px 0 0 0; font-size: 12px;">${point.description || ''}</p>
-                        </div>
-                    `))
-                    .addTo(map.current);
-                markers.current.push(m);
+                if (!markerRoots.current.has(point.id)) {
+                    const popupNode = document.createElement('div');
+                    const root = createRoot(popupNode);
+                    
+                    const m = new (window as any).maplibregl.Marker({ color: '#000000ff' })
+                        .setLngLat([point.longitude, point.latitude])
+                        .setPopup(new (window as any).maplibregl.Popup({ offset: 25 }).setDOMContent(popupNode))
+                        .addTo(map.current);
+                        
+                    markerRoots.current.set(point.id, { root, marker: m, popupNode });
+                }
+
+                // Update the position and re-render the React Component with fresh props
+                const data = markerRoots.current.get(point.id);
+                data.marker.setLngLat([point.longitude, point.latitude]);
+                data.root.render(<MarkerPopup point={point} stops={stops} setStops={setStops} editMode={editMode} />);
             }
         });
-    }, [stops]);
+    }, [stops, editMode]);
 
     // SIDE EFFECT: Draw Valhalla Route Polyline
     useEffect(() => {

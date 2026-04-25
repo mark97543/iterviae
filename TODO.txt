@@ -19,3 +19,5 @@ Save and Cancel Buttons at left panel This will disable the bottom panel buttons
 Need to set up a debounce autosave 
 - Need to disable the load and new buttons on bottom panel while we are in debounce condition (the state of editing) 
 Need to Make Tabs for the left bar. (Trip info (thiw will include stats), stops, itin)
+Need to make the location a button to zoom in on the proper location when clicked
+Make the search disaper when edit is off

@@ -5,6 +5,7 @@ import {useState} from 'react';
 import { useDirectus } from '../../../../../context/DirectusContext';
 import EditTripModal from './Parts/EditTripModal';
 import LoadTripModal from './Parts/LoadTripModal';
+import { useStops } from '../../../../../context/DataContext';
 
 const BOTTOM_PANEL_STYLE=`
     .bottom-panel-wrapper{
@@ -39,6 +40,7 @@ const BottomPanel = () => {
     const [showNewTripModal, setShowNewTripModal] = useState(false);
     const [showEditTripModal, setShowEditTripModal] = useState(false);
     const [showLoadTripModal, setShowLoadTripModal] = useState(false);
+    const {editMode, setEditMode} = useStops()
     const {currentTrip} = useDirectus()
 
 
@@ -58,7 +60,7 @@ const BottomPanel = () => {
 
 
             <Tippy content='Edit Trip'>
-                <button className="std-button new-trip-btn" disabled={!currentTrip} onClick={() => setShowEditTripModal(!showEditTripModal)}>
+                <button className="std-button new-trip-btn" disabled={!currentTrip || editMode} onClick={() => {setEditMode(true)}}>
                     <img src="./edit.png"/>
                 </button>
             </Tippy>

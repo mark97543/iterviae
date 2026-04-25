@@ -115,7 +115,7 @@ const TempMarkerWindow = () =>{
         <div className="temp-marker-window">
             <style>{TEMP_MARKER_WINDOW_STYLE}</style>
             <div className="close-button-div">
-                <h3>New Point</h3>
+                <h3>New Point </h3>
                 <button className="temp-marker-window-close-button" onClick={closeWindow}>X</button>
             </div>
             <h4>{searchStop.long.toFixed(5)}, {searchStop.lat.toFixed(5)}</h4>

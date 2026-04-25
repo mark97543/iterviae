@@ -19,7 +19,7 @@ export const DirectusProvider = ({ children }: { children: React.ReactNode }) =>
     const [directus, setDirectus] = useState(null);
     const [trips, setTrips] = useState<Trip[]>([]); /// All Trips for for this user 
     const [currentTrip, setCurrentTrip] = useState<Trip | null>(null); /// Selected Trip for this user
-    const {stops} = useStops();
+    const {stops,setEditMode} = useStops();
 
     //Save Trip to Directus Database
     const saveTrip = async (tripName: string) => {
@@ -92,7 +92,7 @@ export const DirectusProvider = ({ children }: { children: React.ReactNode }) =>
 
             const result = await axios.get(`https://api.wade-usa.com/items/trip`, {
                 params: {
-                    fields: 'id,trip_name,stop.id,stop.sort,stop.name,stop.longitude,stop.latitude',
+                    fields: 'id,trip_name,stop.id,stop.sort,stop.name,stop.longitude,stop.latitude,stop.note',
                     filter: {
                         id: {
                             _eq: tripId
@@ -159,6 +159,7 @@ export const DirectusProvider = ({ children }: { children: React.ReactNode }) =>
                 console.log("Trip Updated Successfully");
                 const updatedTrip = result.data.data;
                 setTrips(trips.map(t => t.id === updatedTrip.id ? updatedTrip : t));
+                setEditMode(false); // Exit edit mode
                 return updatedTrip;
             } else {
                 console.log("Error Saving Trip");
