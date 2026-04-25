@@ -51,6 +51,40 @@ export const DirectusProvider = ({ children }: { children: React.ReactNode }) =>
         }
     }
 
+    //Load Trips from Directus Database
+    const loadTrips = async () => {
+        try {
+            const token = sessionStorage.getItem('instrumentum_token');
+            if (!token || !user?.id) return null;
+
+            const result = await axios.get(`https://api.wade-usa.com/items/trip`, {
+                params: {
+                    filter: {
+                        user_created: {
+                            _eq: user.id
+                        }
+                    }
+                },
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            
+            if(result.status === 200){
+                console.log("Trips Loaded Successfully");
+                const loadedTrips = result.data.data;
+                setTrips(loadedTrips);
+                return loadedTrips;
+            } else {
+                console.log("Error Loading Trips");
+                return null;
+            }
+        } catch (error) {
+            console.error("Failed to load trips:", error);
+            return null;
+        }
+    }
+
     
 
 
@@ -62,7 +96,8 @@ export const DirectusProvider = ({ children }: { children: React.ReactNode }) =>
             setDirectus, 
             setTrips, 
             setCurrentTrip,
-            saveTrip 
+            saveTrip,
+            loadTrips
         }}>
             {children}
         </DirectusContext.Provider>

@@ -2,6 +2,9 @@ import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
 import NewTripModal from './Parts/NewTripModal';
 import {useState} from 'react';
+import { useDirectus } from '../../../../../context/DirectusContext';
+import EditTripModal from './Parts/EditTripModal';
+import LoadTripModal from './Parts/LoadTripModal';
 
 const BOTTOM_PANEL_STYLE=`
     .bottom-panel-wrapper{
@@ -20,6 +23,7 @@ const BOTTOM_PANEL_STYLE=`
         box-sizing: border-box;
         z-index: 10;
         box-shadow: -4px 0 15px rgba(0,0,0,0.5);
+        gap: var(--gap-small);
     }
 
     .new-trip-btn{
@@ -33,6 +37,10 @@ const BOTTOM_PANEL_STYLE=`
 
 const BottomPanel = () => {
     const [showNewTripModal, setShowNewTripModal] = useState(false);
+    const [showEditTripModal, setShowEditTripModal] = useState(false);
+    const [showLoadTripModal, setShowLoadTripModal] = useState(false);
+    const {currentTrip} = useDirectus()
+
 
     
 
@@ -45,12 +53,28 @@ const BottomPanel = () => {
             <style>{BOTTOM_PANEL_STYLE}</style>
             
             {showNewTripModal && <NewTripModal setModal={setShowNewTripModal}/>}
+            {showEditTripModal && <EditTripModal setModal={setShowEditTripModal}/>}
+            {showLoadTripModal && <LoadTripModal setModal={setShowLoadTripModal}/>}
+
+
+            <Tippy content='Edit Trip'>
+                <button className="std-button new-trip-btn" disabled={!currentTrip} onClick={() => setShowEditTripModal(!showEditTripModal)}>
+                    <img src="./edit.png"/>
+                </button>
+            </Tippy>
 
             <Tippy content="New Trip">
                 <button className="std-button new-trip-btn" onClick={() => setShowNewTripModal(!showNewTripModal)}>
                     <img src="./new.png"/>
                 </button>
             </Tippy>
+
+            <Tippy content="Open Trips">
+                <button className="std-button new-trip-btn" onClick={() => setShowLoadTripModal(!showLoadTripModal)}>
+                    <img src="./open.png"/>
+                </button>
+            </Tippy>
+
         </div>
     )
 }
