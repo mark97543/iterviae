@@ -2,6 +2,8 @@ import { createPortal } from 'react-dom';
 import { useState, useEffect } from 'react';
 import { useDirectus } from '../../../../../../context/DirectusContext';
 import { useStops } from '../../../../../../context/DataContext';
+import { getTripDirections } from '../../../valhala';
+
 
 const LOAD_TRIP_STYLE=`
     .load-trip-modal{
@@ -116,7 +118,7 @@ const LoadTripModal = ({setModal}: {setModal: (show: boolean) => void}) => {
 
     const {loadTrips, loadTripData} = useDirectus();
     const [tripSelections, setTripSelections] = useState([]);
-    const {setSelectedTrip, selectedTrip, setStops} = useStops();
+    const {setSelectedTrip, selectedTrip, setStops, setRoute} = useStops();
 
    
     useEffect(() => {
@@ -158,6 +160,8 @@ const LoadTripModal = ({setModal}: {setModal: (show: boolean) => void}) => {
                                         setSelectedTrip(trip.id);
                                         let data = await loadTripData(trip.id);
                                         if (data) setStops(data.stop);
+                                        let route = await getTripDirections(data.stop);
+                                        setRoute(route);
                                         setModal(false);
                                     }}
                                 >

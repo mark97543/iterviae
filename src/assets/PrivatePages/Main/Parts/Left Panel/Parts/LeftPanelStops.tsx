@@ -14,8 +14,6 @@ const LEFTPANELSTOPSSTYLE=`
 const LeftPanelStops =()=>{
     const {stops, route} = useStops();
 
-    console.log(route?.legs);
-
 
     return(
         <div className="left-panel-stops-wrapper">

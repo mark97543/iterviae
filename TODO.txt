@@ -12,10 +12,8 @@ TODO: Need a Tablet View
 
 NEXT STEPS: 
 
-Add Edit Trip Functionality 
+Add Edit Trip Functionality (this will be for just editing the name)
 Add Delete Trip Functionality (This will be with the load item)
-Add Load Trip Functionality
-Preload all items based on user ID
 Save and Cancel Buttons at left panel This will disable the bottom panel buttons or we could make a warning before leaving of unfinished changes. 
 Need to set up a debounce autosave 
 - Need to disable the load and new buttons on bottom panel while we are in debounce condition (the state of editing) 

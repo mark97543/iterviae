@@ -13,7 +13,12 @@ export interface Stop {
     order?: number;
 }
 
-
+// Interface for the trip data structure
+export interface TripData {
+    id: string;
+    trip_name: string;
+    stop: Stop[];
+}
 
 // 2. Context Type
 interface StopsContextType {
@@ -55,6 +60,7 @@ export const StopsProvider = ({ children }: { children: React.ReactNode }) => {
         }
     }, [user]);
 
+    
 
     return (
         <StopsContext.Provider value={{ 
