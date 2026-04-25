@@ -78,7 +78,7 @@ const TempMarkerWindow = () =>{
 
     const addStop = async () =>{
         const newStop: Stop = {
-            id: Date.now().toString(),
+            id: 'temp_' + Date.now().toString(),
             name: "New Point",
             address: "",
             latitude: searchStop.lat,

@@ -116,9 +116,10 @@ const LOAD_TRIP_STYLE=`
 
 const LoadTripModal = ({setModal}: {setModal: (show: boolean) => void}) => {
 
-    const {loadTrips, loadTripData} = useDirectus();
+    const {loadTrips, loadTripData, deleteTripByID, setCurrentTrip} = useDirectus();
     const [tripSelections, setTripSelections] = useState([]);
-    const {setSelectedTrip, selectedTrip, setStops, setRoute} = useStops();
+    const {setSelectedTrip, setStops, setRoute} = useStops();
+    const [reload, setReload] = useState(1);
 
    
     useEffect(() => {
@@ -128,6 +129,23 @@ const LoadTripModal = ({setModal}: {setModal: (show: boolean) => void}) => {
         };
         loadAll();
     }, []);
+
+    useEffect(() => {
+        const loadAll = async () => {
+            let trips = await loadTrips();
+            setTripSelections(trips);
+        };
+        loadAll();
+    }, [reload]);
+
+    const deleteTrip = async (tripId: string) => {
+        await deleteTripByID(tripId);
+        setSelectedTrip(null);
+        setStops([]);
+        setRoute(null);
+        setCurrentTrip(null);
+        setReload(reload + 1);
+    }
 
 
     return createPortal(
@@ -173,7 +191,7 @@ const LoadTripModal = ({setModal}: {setModal: (show: boolean) => void}) => {
                                         <button 
                                             onClick={(e) => {
                                                 e.stopPropagation(); // Prevents row click when clicking delete
-                                                console.log('Delete clicked for:', trip.trip_name); // TODO: Implement Delete Trip Functionality
+                                                deleteTrip(trip.id);
                                             }}
                                         >
                                             Delete

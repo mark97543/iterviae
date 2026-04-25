@@ -1,6 +1,7 @@
 import LeftPanelStops from "./Parts/LeftPanelStops";
 import LeftPanelSearch from "./Parts/LeftPanelSearch";
-
+import { useDirectus } from "../../../../../context/DirectusContext";
+import { useStops } from "../../../../../context/DataContext";
 
 const LeftPanel_Style = `
 
@@ -25,6 +26,8 @@ const LeftPanel_Style = `
 `;
 
 const LeftPanel = () =>{
+    const {saveTripByID} = useDirectus();
+    const {selectedTrip} = useStops();
 
     return(
         <div className="left-panel-wrapper">
@@ -32,6 +35,7 @@ const LeftPanel = () =>{
     
             <LeftPanelSearch/>
             <LeftPanelStops/>
+            <button className="std-button" onClick={()=>saveTripByID(selectedTrip)}>Save</button>
         </div>
     )
 }
