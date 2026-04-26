@@ -49,20 +49,44 @@ const LOAD_TRIP_STYLE=`
         width: 100%;
         height: 100%;
         display: flex;
-        flex-direction: row;
-        align-items: center;
-        justify-content: center;
+        flex-direction: column;
+        align-items: left;
+        justify-content: top;
         padding: var(--gap-small);
         box-sizing: border-box;
         gap: var(--gap-small);
+        background-color:var(--color-surface)
     }
 
     .std-table {
         width: 100%;
-        border-collapse: collapse;
+        border-collapse: separate;
+        border-spacing: 0;
         font-family: var(--font-main);
         background-color: var(--color-bg);
         border: 1px solid var(--color-border);
+        border-radius: 30px;
+        overflow: hidden;
+    }
+
+    .std-table th:first-child {
+        border-top-left-radius: 28px;
+    }
+    
+    .std-table th:last-child {
+        border-top-right-radius: 28px;
+    }
+    
+    .std-table tbody tr:last-child td:first-child {
+        border-bottom-left-radius: 28px;
+    }
+    
+    .std-table tbody tr:last-child td:last-child {
+        border-bottom-right-radius: 28px;
+    }
+
+    .std-table tbody tr:last-child td {
+        border-bottom: none;
     }
 
     .std-table thead {
@@ -87,14 +111,28 @@ const LOAD_TRIP_STYLE=`
     .std-table tbody tr {
         cursor: pointer;
         transition: background-color 0.2s ease;
+        background-color: transparent;
     }
 
     .std-table tbody tr:nth-child(even) {
-        background-color: rgba(255, 255, 255, 0.03);
+        background-color: rgba(0, 0, 0, 0.3);
+    }
+
+    .std-table tbody tr:nth-child(odd) {
+        background-color: rgba(255, 255, 255, 0.02);
     }
 
     .std-table tbody tr:hover {
-        background-color: rgba(255, 255, 255, 0.08);
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .std-table tbody tr td:first-child {
+        border-left: 3px solid transparent;
+        transition: border-left-color 0.2s ease;
+    }
+
+    .std-table tbody tr:hover td:first-child {
+        border-left-color: var(--color-accent);
     }
 
     .std-table button {
@@ -112,6 +150,7 @@ const LOAD_TRIP_STYLE=`
     .std-table button:hover {
         color: var(--color-accent);
     }
+
 `
 
 const LoadTripModal = ({setModal}: {setModal: (show: boolean) => void}) => {
