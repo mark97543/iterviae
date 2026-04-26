@@ -1,10 +1,6 @@
 TODO: Right Click Menu
 TODO: Custom Waypoint Markers. 
-TODO: Be able to move Waypoints
-***********TODO: Add Load/Save Route
 TODO: Need the search for bar to allow adresses and search for locations
-***********TODO: Need to be able to drag waypoints on map
-TODO: Waypoint on left bar when clicked go to it and open info panel
 TODO: Add Setting to change colors for routes 
 TODO: Change Marker Color and Shape
 TODO: Need a mobile view
@@ -14,23 +10,15 @@ TODO: Route Slider for the route
 TOD0: Right click add point
 TODO: Points of interest
 TODO: Directus schema for future downloads
+TODO: Need To set up a debounce autosave
+TODO: Cancel Save Button (Maybe not necessary since we are debouncing the save)
+TODO: Need add Favicon.ico file
+TODO: need to add Trip Stats to the Info Panel
+TODO: Need to Add pagenation to the load trip modal
+TODO: Need Make a ITIN Page
+TODO: Search For the Open Trip MOdal
+TODO: Need To add summing of the directions
 
 
-NEXT STEPS: 
-
-Need to be able to delete stops 
-Add Delete Trip Functionality (This will be with the load item)
-Need to set up a debounce autosave 
-- Need to disable the load and new buttons on bottom panel while we are in debounce condition (the state of editing) 
-Need to Make Tabs for the left bar. (Trip info (thiw will include stats), stops, itin)
-Need to make the location a button to zoom in on the proper location when clicked
-Need incorperate a cancel save
-Need a favicon 
-Need to add trip stats (this will be generated on load and during trip change)
-Need the LoadTripModal to add pagination
-Need to add Search function to the LoadTripModal to load only the trips that match the search term or checkboxes
-Need to add summing of the directions
-
-
-Next Micro Project: 
-Delete Waypoint
+Working on the following right now: 
+Favicon (add it so that it can be used)
