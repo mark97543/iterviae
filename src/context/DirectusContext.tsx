@@ -10,6 +10,8 @@ export interface Trip {
     trip_name?: string;
     summary?: string;
     status?: string;
+    distance?: number;
+    ride_time?: number;
     stop?: Stop[];
 }
 
@@ -23,7 +25,7 @@ export const DirectusProvider = ({ children }: { children: React.ReactNode }) =>
     const [directus, setDirectus] = useState(null);
     const [trips, setTrips] = useState<Trip[]>([]); /// All Trips for for this user 
     const [currentTrip, setCurrentTrip] = useState<Trip | null>(null); /// Selected Trip for this user
-    const {stops,setEditMode, setStops} = useStops();
+    const {stops,setEditMode, setStops, route} = useStops();
 
     // Wipe session data when user logs out
     useEffect(() => {
@@ -69,7 +71,7 @@ export const DirectusProvider = ({ children }: { children: React.ReactNode }) =>
 
             const result = await axios.get(`https://api.wade-usa.com/items/trip`, {
                 params: {
-                    fields: 'id,trip_name',
+                    fields: 'id,trip_name, distance, ride_time, status',
                     filter: {
                         user_created: {
                             _eq: user.id
@@ -159,6 +161,8 @@ export const DirectusProvider = ({ children }: { children: React.ReactNode }) =>
                 trip_name: currentTrip?.trip_name,
                 status: currentTrip?.status,
                 summary: currentTrip?.summary,
+                distance: route?.distance,
+                ride_time: route?.duration,
                 stop: {
                     create: createStops,
                     update: updateStops

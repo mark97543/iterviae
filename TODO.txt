@@ -12,11 +12,10 @@ TODO: Points of interest
 TODO: Directus schema for future downloads
 TODO: Need To set up a debounce autosave
 TODO: Cancel Save Button (Maybe not necessary since we are debouncing the save)
-TODO: need to add Trip Stats to the Info Panel
 TODO: Need to Add pagenation to the load trip modal
 TODO: Need Make a ITIN Page
 TODO: Search For the Open Trip MOdal
 
 
 Working on the following right now: 
-Change Route Status
+add Trip Stats to the Directus schema to include i nthe load trip modal 

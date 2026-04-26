@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useDirectus } from '../../../../../../context/DirectusContext';
 import { useStops } from '../../../../../../context/DataContext';
 import { getTripDirections } from '../../../valhala';
+import { STATUS_DROPDOWN } from '../../Left Panel/Parts/Info';
 
 
 const LOAD_TRIP_STYLE=`
@@ -95,7 +96,7 @@ const LOAD_TRIP_STYLE=`
 
     .std-table th {
         padding: var(--gap-medium);
-        text-align: left;
+        text-align: center;
         color: var(--color-primary);
         font-size: var(--font-size-medium);
         font-weight: bold;
@@ -106,6 +107,15 @@ const LOAD_TRIP_STYLE=`
     .std-table td {
         padding: var(--gap-small) var(--gap-medium);
         border-bottom: 1px solid var(--color-border);
+        text-align: center;
+    }
+
+    .std-table th:first-child, .std-table td:first-child {
+        text-align: left;
+    }
+
+    .std-table th:last-child, .std-table td:last-child {
+        text-align: right;
     }
 
     .std-table tbody tr {
@@ -204,7 +214,8 @@ const LoadTripModal = ({setModal}: {setModal: (show: boolean) => void}) => {
                             <th>Trip Name</th>
                             {/* Placeholder headers for future columns */}
                             <th>Status</th>
-                            <th>Date Created</th>
+                            <th>Distance(mi)</th>
+                            <th>Est. Time</th>
                             <th></th> {/* Empty header for delete button */}
                         </tr>
                     </thead>
@@ -223,9 +234,26 @@ const LoadTripModal = ({setModal}: {setModal: (show: boolean) => void}) => {
                                     }}
                                 >
                                     <td>{trip.trip_name}</td>
-                                    {/* Placeholder data cells for future columns*/}
-                                    <td>Draft</td>
-                                    <td>{new Date().toLocaleDateString()}</td>
+                                    <td>
+                                        {(() => {
+                                            const status = STATUS_DROPDOWN.find(s => s.value === trip.status);
+                                            return (
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'center' }}>
+                                                    <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: status?.color || 'rgba(255,255,255,0.2)' }}></div>
+                                                    {status?.label || trip.status || "-"}
+                                                </div>
+                                            );
+                                        })()}
+                                    </td>
+                                    <td>{trip.distance? Number(trip.distance).toFixed(1) : "-"}</td>
+                                    <td>{trip.ride_time ? (
+                                        (() => {
+                                            const d = Number(trip.ride_time);
+                                            const h = Math.floor(d / 3600);
+                                            const m = Math.floor(d % 3600 / 60);
+                                            return h > 0 ? `${h}h ${m}m` : `${m}m`;
+                                        })()
+                                    ) : "-"}</td>
                                     <td>
                                         <button 
                                             onClick={(e) => {

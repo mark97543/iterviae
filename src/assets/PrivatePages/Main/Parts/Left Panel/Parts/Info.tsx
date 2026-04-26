@@ -134,7 +134,7 @@ const InfoStyle = `
     }
 `;
 
-const STATUS_DROPDOWN = [
+export const STATUS_DROPDOWN = [
     {
         label:'Planning',
         value:'draft',
