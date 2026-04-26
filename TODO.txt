@@ -9,16 +9,16 @@ TODO: Add Setting to change colors for routes
 TODO: Change Marker Color and Shape
 TODO: Need a mobile view
 TODO: Need a Tablet View
+TODO: Add save before exiting warning
 
 NEXT STEPS: 
 
-Add Edit Trip Functionality (this will be for just editing the name)
 Need to be able to delete stops 
 Add Delete Trip Functionality (This will be with the load item)
-Save and Cancel Buttons at left panel This will disable the bottom panel buttons or we could make a warning before leaving of unfinished changes. 
 Need to set up a debounce autosave 
 - Need to disable the load and new buttons on bottom panel while we are in debounce condition (the state of editing) 
 Need to Make Tabs for the left bar. (Trip info (thiw will include stats), stops, itin)
 Need to make the location a button to zoom in on the proper location when clicked
 Need incorperate a cancel save
 Need a favicon 
+Need to add trip stats (this will be generated on load and during trip change)

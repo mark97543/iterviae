@@ -14,6 +14,13 @@ const LEFTPANELSTOPSSTYLE=`
 const LeftPanelStops =()=>{
     const {stops, route} = useStops();
 
+    //Seconds to XXhr XXmin format
+    function secondsToHms(d: number) {
+        d = Number(d);
+        const h = Math.floor(d / 3600);
+        const m = Math.floor(d % 3600 / 60);
+        return h + " hr " + m + " min";
+    }
 
     return(
         <div className="left-panel-stops-wrapper">
@@ -27,7 +34,7 @@ const LeftPanelStops =()=>{
                     {route?.legs && index < route.legs.length && (
                         <div>
                             <p>{route.legs[index]?.summary?.length?.toFixed(2)} miles</p>
-                            <p>{route.legs[index]?.summary?.time} seconds</p>                        
+                            <p>{secondsToHms(route.legs[index]?.summary?.time)}</p>                        
                         </div>
                     )}
                 </div>
