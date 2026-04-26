@@ -9,6 +9,7 @@ export interface Trip {
     id?: string;
     trip_name?: string;
     summary?: string;
+    status?: string;
     stop?: Stop[];
 }
 
@@ -156,6 +157,7 @@ export const DirectusProvider = ({ children }: { children: React.ReactNode }) =>
 
             const result = await axios.patch(`https://api.wade-usa.com/items/trip/${tripId}`, {
                 trip_name: currentTrip?.trip_name,
+                status: currentTrip?.status,
                 summary: currentTrip?.summary,
                 stop: {
                     create: createStops,

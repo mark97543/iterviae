@@ -16,9 +16,7 @@ TODO: need to add Trip Stats to the Info Panel
 TODO: Need to Add pagenation to the load trip modal
 TODO: Need Make a ITIN Page
 TODO: Search For the Open Trip MOdal
-TODO: Need To add summing of the directions
 
 
 Working on the following right now: 
-Summing up the distance and time 
-- It apears the route provides this information. so should be able import and convert. 
+Change Route Status

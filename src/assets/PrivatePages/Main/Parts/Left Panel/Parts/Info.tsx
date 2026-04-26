@@ -117,7 +117,43 @@ const InfoStyle = `
         margin: 0;
         white-space: nowrap;
     }
+
+    .info-status-badge {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: var(--gap-medium);
+        width: 100%;
+        box-sizing: border-box;
+    }
 `;
+
+const STATUS_DROPDOWN = [
+    {
+        label:'Planning',
+        value:'draft',
+        color:'var(--color-accent)',
+        bar:'yellow'
+    },
+    {
+        label:'Planned',
+        value:'published',
+        color:'var(--color-secondary)',
+        bar:'green'
+    },
+    {
+        label:'Ride Complete',
+        value:'archived',
+        color:'var(--color-tertiary)',
+        bar:'blue'
+    }
+];
 
 const Info = () =>{
     const {editMode, route} = useStops();
@@ -137,6 +173,21 @@ const Info = () =>{
                             value={currentTrip?.trip_name || ''}
                             onChange={(e) => setCurrentTrip({...currentTrip, trip_name: e.target.value})}
                         />
+                    </div>
+
+                    <div className="info-edit-group">
+                        <span className="info-label">Status</span>
+                        <select 
+                            className="std-input"
+                            value={currentTrip?.status || 'Draft'}
+                            onChange={(e) => setCurrentTrip({...currentTrip, status: e.target.value})}
+                        >
+                            {STATUS_DROPDOWN.map((status) => (
+                                <option key={status.value} value={status.value}>
+                                    {status.label}
+                                </option>
+                            ))}
+                        </select>
                     </div>
 
                     <div className="info-description-group">
@@ -176,7 +227,23 @@ const Info = () =>{
                 </div>
             ):(
                 <div className="info-content">
-                    <h3 className="info-title">{currentTrip?.trip_name || 'Unnamed Trip'}</h3>
+                    {(() => {
+                        const statusObj = STATUS_DROPDOWN.find(s => s.value === (currentTrip?.status || 'Draft')) || STATUS_DROPDOWN[0];
+                        return (
+                            <div 
+                                className="info-status-badge" 
+                                style={{ 
+                                    backgroundColor: `${statusObj.bar}`, 
+                                    color: statusObj.color
+                                }}
+                            >
+                                {statusObj.label}
+                            </div>
+                        );
+                    })()}
+
+                    <h3 className="info-title" style={{marginTop: 0}}>{currentTrip?.trip_name || 'Unnamed Trip'}</h3>
+                    
                     {currentTrip?.summary && (
                         <p className="info-summary-text">{currentTrip.summary}</p>
                     )}
