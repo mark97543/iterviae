@@ -92,7 +92,7 @@ const MapComponent = () => {
     const map = useRef<any>(null);
     const markerRoots = useRef<Map<string, any>>(new Map());
     const [mapLoaded, setMapLoaded] = useState(false);
-    const {stops, route, setStops, editMode, setRoute} = useStops();
+    const {stops, route, setStops, editMode, setRoute, focusedID} = useStops();
 
 
     // SIDE EFFECT: Load External Map Assets
@@ -201,6 +201,34 @@ const MapComponent = () => {
             }
         });
     }, [stops, editMode]);
+
+    // SIDE EFFECT: Listen for focus requests from the sidebar
+    useEffect(() => {
+        if (!mapLoaded || !map.current || !focusedID) return;
+
+        // Close all other popups first to prevent multiple popups showing at once
+        for (const [id, markerData] of markerRoots.current.entries()) {
+            const popup = markerData.marker.getPopup();
+            if (id !== focusedID && popup && popup.isOpen()) {
+                popup.remove(); // This safely closes the popup in MapLibre
+            }
+        }
+
+        const data = markerRoots.current.get(focusedID);
+        if (data && data.marker) {
+            const lngLat = data.marker.getLngLat();
+            map.current.flyTo({
+                center: [lngLat.lng, lngLat.lat],
+                zoom: 10, // Zoom in to see the stop
+                duration: 2500, // Slightly longer duration for the dramatic fly animation
+                essential: true,
+            });
+            // Optional: Automatically open the popup when focused
+            if (!data.marker.getPopup().isOpen()) {
+                data.marker.togglePopup();
+            }
+        }
+    }, [focusedID, mapLoaded]);
 
     // SIDE EFFECT: Draw Valhalla Route Polyline
     useEffect(() => {

@@ -38,7 +38,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     const attemptRefresh = async (): Promise<boolean> => {
-        const refreshToken = sessionStorage.getItem('instrumentum_refresh');
+        const refreshToken = localStorage.getItem('instrumentum_refresh');
         if (!refreshToken) return false;
 
         try {
@@ -53,8 +53,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             const newRefreshToken = data?.data?.refresh_token;
 
             if (newAccessToken) {
-                sessionStorage.setItem('instrumentum_token', newAccessToken);
-                if (newRefreshToken) sessionStorage.setItem('instrumentum_refresh', newRefreshToken);
+                localStorage.setItem('instrumentum_token', newAccessToken);
+                if (newRefreshToken) localStorage.setItem('instrumentum_refresh', newRefreshToken);
                 return await checkTokenAndFetchUser(newAccessToken);
             }
             return false;
@@ -65,7 +65,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     useEffect(() => {
         const initAuth = async () => {
-            const token = sessionStorage.getItem('instrumentum_token');
+            const token = localStorage.getItem('instrumentum_token');
             if (token) {
                 const isValid = await checkTokenAndFetchUser(token);
                 if (!isValid) {
@@ -104,8 +104,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             const tokens = data.data;
 
             if (tokens?.access_token) {
-                sessionStorage.setItem('instrumentum_token', tokens.access_token);
-                if (tokens.refresh_token) sessionStorage.setItem('instrumentum_refresh', tokens.refresh_token);
+                localStorage.setItem('instrumentum_token', tokens.access_token);
+                if (tokens.refresh_token) localStorage.setItem('instrumentum_refresh', tokens.refresh_token);
                 
                 // Fetch the user data with the fresh token
                 const success = await checkTokenAndFetchUser(tokens.access_token);
@@ -154,7 +154,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     const logout = () => {
-        sessionStorage.clear();
+        localStorage.clear();
         setUser(null);
         setLoading(false);
         setError(null);

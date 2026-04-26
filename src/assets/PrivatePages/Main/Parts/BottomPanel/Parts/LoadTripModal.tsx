@@ -164,7 +164,7 @@ const LoadTripModal = ({setModal}: {setModal: (show: boolean) => void}) => {
     useEffect(() => {
         const loadAll = async () => {
             let trips = await loadTrips();
-            setTripSelections(trips);
+            setTripSelections(trips || []);
         };
         loadAll();
     }, []);
@@ -172,7 +172,7 @@ const LoadTripModal = ({setModal}: {setModal: (show: boolean) => void}) => {
     useEffect(() => {
         const loadAll = async () => {
             let trips = await loadTrips();
-            setTripSelections(trips);
+            setTripSelections(trips || []);
         };
         loadAll();
     }, [reload]);

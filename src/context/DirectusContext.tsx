@@ -35,7 +35,7 @@ export const DirectusProvider = ({ children }: { children: React.ReactNode }) =>
     //Save Trip to Directus Database
     const saveTrip = async (tripName: string) => {
         try {
-            const token = sessionStorage.getItem('instrumentum_token');
+            const token = localStorage.getItem('instrumentum_token');
             const result = await axios.post(`https://api.wade-usa.com/items/trip`, {
                 trip_name: tripName,
                 user_id: user?.id,
@@ -63,7 +63,7 @@ export const DirectusProvider = ({ children }: { children: React.ReactNode }) =>
     //Load Trips from Directus Database
     const loadTrips = async () => {
         try {
-            const token = sessionStorage.getItem('instrumentum_token');
+            const token = localStorage.getItem('instrumentum_token');
             if (!token || !user?.id) return null;
 
             const result = await axios.get(`https://api.wade-usa.com/items/trip`, {
@@ -98,7 +98,7 @@ export const DirectusProvider = ({ children }: { children: React.ReactNode }) =>
     //Load data by selected trip ID
     const loadTripData = async (tripId: string) => {
         try {
-            const token = sessionStorage.getItem('instrumentum_token');
+            const token = localStorage.getItem('instrumentum_token');
             if (!token || !tripId) return null;
 
             const result = await axios.get(`https://api.wade-usa.com/items/trip`, {
@@ -134,7 +134,7 @@ export const DirectusProvider = ({ children }: { children: React.ReactNode }) =>
     const saveTripByID = async (tripId: string) => {
         //console.log(tripId)
         try {
-            const token = sessionStorage.getItem('instrumentum_token');
+            const token = localStorage.getItem('instrumentum_token');
             if (!token || !tripId) return null;
 
             const createStops: any[] = [];
@@ -186,7 +186,7 @@ export const DirectusProvider = ({ children }: { children: React.ReactNode }) =>
     //Delete Trip By ID
     const deleteTripByID = async (tripId: string) => {
         try {
-            const token = sessionStorage.getItem('instrumentum_token');
+            const token = localStorage.getItem('instrumentum_token');
             if (!token || !tripId) return null;
 
             const result = await axios.delete(`https://api.wade-usa.com/items/trip/${tripId}`, {

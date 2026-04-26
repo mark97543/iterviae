@@ -37,6 +37,8 @@ interface StopsContextType {
     setSelectedTrip: React.Dispatch<React.SetStateAction<string>>;
     editMode: boolean;
     setEditMode: React.Dispatch<React.SetStateAction<boolean>>;
+    focusedID: string;
+    setFocusedID: React.Dispatch<React.SetStateAction<string>>;
 }
 
 // 3. Create the Context
@@ -52,6 +54,7 @@ export const StopsProvider = ({ children }: { children: React.ReactNode }) => {
     const [selectedTrip, setSelectedTrip] = useState(""); // The selected trip to load this is the trip ID
     const [editMode,setEditMode]=useState(false) // Whether the trip is in edit mode 
     const { user } = useAuth();
+    const [focusedID, setFocusedID] = useState(null); // The focused ID for the map to use
 
     // SIDE EFFECT: Wipe all mapping data out of memory on Logout
     useEffect(() => {
@@ -83,7 +86,9 @@ export const StopsProvider = ({ children }: { children: React.ReactNode }) => {
             selectedTrip,
             setSelectedTrip,
             editMode,
-            setEditMode
+            setEditMode,
+            focusedID,
+            setFocusedID
             }}>
             {children}
         </StopsContext.Provider>

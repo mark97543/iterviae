@@ -13,7 +13,8 @@ TODO: Add save before exiting warning
 TODO: Route Slider for the route
 TOD0: Right click add point
 TODO: Points of interest
-TODO: Directus Scheme
+TODO: Directus schema for future downloads
+
 
 NEXT STEPS: 
 

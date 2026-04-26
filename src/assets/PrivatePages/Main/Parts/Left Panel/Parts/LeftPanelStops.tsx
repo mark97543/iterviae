@@ -76,7 +76,7 @@ const LEFTPANELSTOPSSTYLE = `
 `;
 
 const LeftPanelStops =()=>{
-    const {stops, route} = useStops();
+    const {stops, route, focusedID, setFocusedID} = useStops();
 
     //Seconds to XXhr XXmin format
     function secondsToHms(d: number) {
@@ -89,12 +89,16 @@ const LeftPanelStops =()=>{
         return m + " min";
     }
 
+    const setFocus = (stop: any) =>{
+        setFocusedID(stop.id);
+    }
+
     return(
         <div className="left-panel-stops-wrapper">
             <style>{LEFTPANELSTOPSSTYLE}</style>
             {stops.map((stop: any, index: number) => (
                 <div key={stop.id} className="stop-item-container">
-                    <div className="stop-name-location">
+                    <div className="stop-name-location" onClick={() => setFocus(stop)}>
                         <p className="stop-name">{stop.name || 'Unnamed Stop'}</p>
                         <p className="stop-coords">{Number(stop.longitude).toFixed(5)}, {Number(stop.latitude).toFixed(5)}</p>
                     </div>
