@@ -177,10 +177,18 @@ const MapComponent = () => {
                     const popupNode = document.createElement('div');
                     const root = createRoot(popupNode);
                     
-                    const m = new (window as any).maplibregl.Marker({ color: '#000000ff' })
+                    const m = new (window as any).maplibregl.Marker({ color: '#000000ff', draggable: editMode })
                         .setLngLat([point.longitude, point.latitude])
                         .setPopup(new (window as any).maplibregl.Popup({ offset: 25 }).setDOMContent(popupNode))
                         .addTo(map.current);
+                        
+                    m.on('dragend', () => {
+                        const lngLat = m.getLngLat();
+                        // Use functional state update to prevent stale closures from when marker was created
+                        setStops((prevStops: any[]) => prevStops.map((s: any) => 
+                            s.id === point.id ? { ...s, latitude: lngLat.lat, longitude: lngLat.lng } : s
+                        ));
+                    });
                         
                     markerRoots.current.set(point.id, { root, marker: m, popupNode });
                 }
@@ -188,6 +196,7 @@ const MapComponent = () => {
                 // Update the position and re-render the React Component with fresh props
                 const data = markerRoots.current.get(point.id);
                 data.marker.setLngLat([point.longitude, point.latitude]);
+                data.marker.setDraggable(editMode); // Dynamically toggle draggable state
                 data.root.render(<MarkerPopup point={point} stops={stops} setStops={setStops} editMode={editMode} />);
             }
         });

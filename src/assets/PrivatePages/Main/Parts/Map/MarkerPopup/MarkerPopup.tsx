@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useStops } from "../../../../../../context/DataContext";
 
 const MARKER_POPUP_STYLE=`
@@ -112,6 +112,11 @@ const MarkerPopup = ({ point, stops, setStops, editMode }: { point: any, stops: 
             }
         }
     }
+
+    // Keep the input text strictly in sync if the marker is dragged
+    useEffect(() => {
+        setCoordsText(`${point.latitude}, ${point.longitude}`);
+    }, [point.latitude, point.longitude]);
 
 
 
