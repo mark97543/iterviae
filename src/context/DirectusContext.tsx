@@ -22,7 +22,7 @@ export const DirectusProvider = ({ children }: { children: React.ReactNode }) =>
     const [directus, setDirectus] = useState(null);
     const [trips, setTrips] = useState<Trip[]>([]); /// All Trips for for this user 
     const [currentTrip, setCurrentTrip] = useState<Trip | null>(null); /// Selected Trip for this user
-    const {stops,setEditMode} = useStops();
+    const {stops,setEditMode, setStops} = useStops();
 
     // Wipe session data when user logs out
     useEffect(() => {
@@ -195,17 +195,45 @@ export const DirectusProvider = ({ children }: { children: React.ReactNode }) =>
                 }
             });
             
-            if(result.status === 200){
+            if(result.status === 200 || result.status === 204){
                 console.log("Trip Deleted Successfully");
-                const deletedTrip = result.data.data;
-                setTrips(trips.filter(t => t.id !== deletedTrip.id));
-                return deletedTrip;
+                setTrips((prevTrips: any[]) => prevTrips.filter((t: any) => t.id !== tripId));
+                return true;
             } else {
                 console.log("Error Deleting Trip");
                 return null;
             }
         } catch (error) {
             console.error("Failed to delete trip:", error);
+            return null;
+        }
+    }
+
+    //Delete Waypoint By ID
+    const deleteWaypointByID = async (waypointId: string) => {
+        try {
+            const token = localStorage.getItem('instrumentum_token');
+            if (!token || !waypointId) return null;
+
+            const result = await axios.delete(`https://api.wade-usa.com/items/stops/${waypointId}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            
+            if(result.status === 200 || result.status === 204){
+                console.log("Waypoint Deleted Successfully");
+                setStops((prevStops: any[]) => prevStops.filter((s: any) => s.id !== waypointId));
+                return true;
+            } else {
+                console.log("Error Deleting Waypoint");
+                return null;
+            }
+        } catch (error: any) {
+            console.error("Failed to delete waypoint:", error);
+            if (error.response && error.response.data && error.response.data.errors) {
+                console.error("Directus Error Details:", error.response.data.errors);
+            }
             return null;
         }
     }
@@ -222,7 +250,8 @@ export const DirectusProvider = ({ children }: { children: React.ReactNode }) =>
             loadTrips,
             loadTripData,
             saveTripByID,
-            deleteTripByID
+            deleteTripByID,
+            deleteWaypointByID
         }}>
             {children}
         </DirectusContext.Provider>

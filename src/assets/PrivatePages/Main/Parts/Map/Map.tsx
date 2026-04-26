@@ -5,6 +5,7 @@ import TempMarker from './Temp Marker/TempMarker';
 import polyline from '@mapbox/polyline';
 import MarkerPopup from './MarkerPopup/MarkerPopup';
 import { getTripDirections } from '../../valhala';
+import { useDirectus } from '../../../../../context/DirectusContext';
 /**
  * CLASSICAL MECHANICS: UI STYLING
  * Defining the visual boundaries of the application.
@@ -93,6 +94,7 @@ const MapComponent = () => {
     const markerRoots = useRef<Map<string, any>>(new Map());
     const [mapLoaded, setMapLoaded] = useState(false);
     const {stops, route, setStops, editMode, setRoute, focusedID} = useStops();
+    const { deleteWaypointByID } = useDirectus();
 
 
     // SIDE EFFECT: Load External Map Assets
@@ -197,7 +199,7 @@ const MapComponent = () => {
                 const data = markerRoots.current.get(point.id);
                 data.marker.setLngLat([point.longitude, point.latitude]);
                 data.marker.setDraggable(editMode); // Dynamically toggle draggable state
-                data.root.render(<MarkerPopup point={point} stops={stops} setStops={setStops} editMode={editMode} />);
+                data.root.render(<MarkerPopup point={point} stops={stops} setStops={setStops} editMode={editMode} deleteWaypointByID={deleteWaypointByID} />);
             }
         });
     }, [stops, editMode]);

@@ -30,4 +30,7 @@ Need to add trip stats (this will be generated on load and during trip change)
 Need the LoadTripModal to add pagination
 Need to add Search function to the LoadTripModal to load only the trips that match the search term or checkboxes
 Need to add summing of the directions
-Need to add zooming into the point clicked with the info popup 
+
+
+Next Micro Project: 
+Delete Waypoint

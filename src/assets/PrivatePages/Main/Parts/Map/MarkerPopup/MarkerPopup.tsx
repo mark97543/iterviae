@@ -94,7 +94,7 @@ const MARKER_POPUP_STYLE=`
     }
 `;
 
-const MarkerPopup = ({ point, stops, setStops, editMode }: { point: any, stops: any[], setStops: any, editMode: boolean }) =>{
+const MarkerPopup = ({ point, stops, setStops, editMode, deleteWaypointByID }: { point: any, stops: any[], setStops: any, editMode: boolean, deleteWaypointByID: any }) =>{
 
     const [coordsText, setCoordsText] = useState(`${point.latitude}, ${point.longitude}`);
 
@@ -150,6 +150,7 @@ const MarkerPopup = ({ point, stops, setStops, editMode }: { point: any, stops: 
                         placeholder="Add details about this stop..."
                         onChange={(e) => setStops(stops.map((s: any) => s.id === point.id ? { ...s, note: e.target.value } : s))} 
                     />
+                    <button className="std-button" style={{marginTop: '4px'}} onClick={async () => await deleteWaypointByID(point.id)}>Delete</button>
                 </div>
             ) : (
                 <div className="marker-popup-view">
