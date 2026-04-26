@@ -66,6 +66,27 @@ const LeftPanel_Style = `
         flex-direction: column;
         gap: var(--gap-small);
         overflow-y: auto;
+        direction: rtl; /* Move scrollbar to left */
+        padding-left: var(--gap-small); /* Breathing room */
+    }
+
+    .tab-content > * {
+        direction: ltr; /* Reset text direction */
+    }
+
+    /* Premium Scrollbar */
+    .tab-content::-webkit-scrollbar {
+        width: 4px;
+    }
+    .tab-content::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    .tab-content::-webkit-scrollbar-thumb {
+        background-color: var(--color-border);
+        border-radius: 10px;
+    }
+    .tab-content::-webkit-scrollbar-thumb:hover {
+        background-color: var(--color-accent);
     }
 `;
 

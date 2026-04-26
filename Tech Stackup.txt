@@ -1,0 +1,24 @@
+# IterViae - Technology Stack (Last Update 4/26/2026)
+
+This document outlines the complete, self-hosted technology stack for IterViae. The architecture is designed to be highly scalable, completely independent of expensive third-party mapping APIs (like Google Maps or Mapbox), and easily deployable via Docker.
+
+## 1. Frontend & UI (Client)
+- **Framework**: React built with TypeScript.
+- **Build Tool**: Vite.
+- **Styling**: Premium Vanilla CSS utilizing CSS variables for a cohesive dark mode theme. Built from the ground up for maximum aesthetic control without relying on heavy utility frameworks.
+- **Map Renderer**: MapLibre GL JS.
+
+## 2. Map Data & Routing Engine (GIS Layer)
+- **Visual Map Data**: Protomaps (.pmtiles). We serve our own vector map tiles to eliminate third-party map rendering costs entirely.
+- **Routing Engine**: Valhalla (via Docker: `ghcr.io/valhalla/valhalla-scripted`). A self-hosted routing engine used to calculate driving and motorcycle routes instantly.
+  - *Note: Our frontend implements a custom asynchronous chunking algorithm to bypass Valhalla's maximum distance constraints, enabling seamless cross-country routing.*
+
+## 3. Backend & Database (Data Layer)
+- **Backend / API / Auth**: Directus. A powerful open-source headless CMS that instantly generates APIs and securely manages our database of users, trips, stops, and authentication flows.
+
+## 4. DevOps, Hosting & Infrastructure (Server)
+- **VPS Provider**: Hostinger (Location: Boston, US).
+  - **Plan Specs**: KVM 2 Plan (2 CPU Cores, 8 GB RAM, 100 GB NVMe Disk Space).
+  - **Operating System**: Ubuntu 24.04 LTS.
+- **Server Management**: Easypanel. A Docker-based visual control panel that simplifies the management of all services, volumes, and SSL certificates.
+- **Containerization**: Docker. The entire stack is containerized and cleanly separated into specialized microservices (e.g., `valhalla`, `directus`, `instrumentum-map-data`, and the frontend application).

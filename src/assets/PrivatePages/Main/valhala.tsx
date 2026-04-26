@@ -6,43 +6,71 @@ import {type Stop} from "../../../context/DataContext";
  * @returns Array of shapes for the trip
  */
 const getTripDirections = async (stops: Stop[]) => {
+    // 1. Filter out any invalid stops that don't have coordinates yet
+    const validStops = stops.filter(s => s.longitude != null && s.latitude != null && !isNaN(Number(s.longitude)) && !isNaN(Number(s.latitude)));
+    
     // A route requires at least a start and an end point.
-    if (stops.length < 2) return null;
+    if (validStops.length < 2) return null;
 
-    // 1. Map your dataset into the Valhalla 'locations' format
-    const locations = stops.map(stop => ({
-        lon: stop.longitude,
-        lat: stop.latitude,
+    // 2. Map your dataset into the Valhalla 'locations' format
+    const locations = validStops.map(stop => ({
+        lon: Number(stop.longitude),
+        lat: Number(stop.latitude),
         type: 'break', // Tells Valhalla to formally stop at this coordinate
     }));
 
-    // 2. Build the query for the entire trip
-    const query = {
-        locations,
-        costing: "motorcycle",
-        units: "miles"
-    };
+    // 3. To bypass the 500km server limit, break the trip into adjacent segments
+    const promises = [];
+    for (let i = 0; i < locations.length - 1; i++) {
+        const chunk = [locations[i], locations[i + 1]];
+        const query = {
+            locations: chunk,
+            costing: "motorcycle",
+            units: "miles"
+        };
 
-    const response = await fetch(`https://valhalla.wade-usa.com/route`, {
-        method: 'POST',
-        body: JSON.stringify(query)
-    });
+        promises.push(
+            fetch(`https://valhalla.wade-usa.com/route`, {
+                method: 'POST',
+                body: JSON.stringify(query)
+            }).then(async res => {
+                if (!res.ok) {
+                    console.error(`Valhalla routing failed for segment ${i + 1} with status: ${res.status}`);
+                    return null;
+                }
+                return await res.json();
+            }).catch(error => {
+                console.error(`Network error on segment ${i + 1}:`, error);
+                return null;
+            })
+        );
+    }
 
-    const data = await response.json();
+    // 4. Fetch all segments in parallel for maximum speed
+    const results = await Promise.all(promises);
 
-    // 3. Valhalla returns an array of 'legs' (one for each segment between points)
-    // We extract all shapes to create one continuous line
-    // const fullShape = data.trip.legs.map((leg: any) => leg.shape);
-    
+    // 5. Stitch the responses together
+    let allShapes = [];
+    let totalDistance = 0;
+    let totalDuration = 0;
+    let allLegs = [];
+
+    for (const data of results) {
+        if (!data || !data.trip || !data.trip.legs) {
+            console.error("Valhalla returned invalid data structure for a segment.");
+            return null; // Fail gracefully if any segment fails
+        }
+        allShapes.push(...data.trip.legs.map((leg: any) => leg.shape));
+        totalDistance += data.trip.summary.length;
+        totalDuration += data.trip.summary.time;
+        allLegs.push(...data.trip.legs);
+    }
+
     return {
-        // 1. Array of shapes (same as before)
-        shapes: data.trip.legs.map((leg: any) => leg.shape),
-        // 2. Total distance in miles
-        distance: data.trip.summary.length,
-        // 3. Total time in seconds
-        duration: data.trip.summary.time,
-        // 4. Total time in seconds
-        legs: data.trip.legs
+        shapes: allShapes,
+        distance: totalDistance,
+        duration: totalDuration,
+        legs: allLegs
     }; 
 };
 

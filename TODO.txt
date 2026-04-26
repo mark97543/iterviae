@@ -10,6 +10,10 @@ TODO: Change Marker Color and Shape
 TODO: Need a mobile view
 TODO: Need a Tablet View
 TODO: Add save before exiting warning
+TODO: Route Slider for the route
+TOD0: Right click add point
+TODO: Points of interest
+TODO: Directus Scheme
 
 NEXT STEPS: 
 
@@ -24,8 +28,5 @@ Need a favicon
 Need to add trip stats (this will be generated on load and during trip change)
 Need the LoadTripModal to add pagination
 Need to add Search function to the LoadTripModal to load only the trips that match the search term or checkboxes
-
-
-Left Off: 
-
-Working on the stops tab formating. 
+Need to add summing of the directions
+Need to add zooming into the point clicked with the info popup 
