@@ -12,7 +12,6 @@ TODO: Points of interest
 TODO: Directus schema for future downloads
 TODO: Need To set up a debounce autosave
 TODO: Cancel Save Button (Maybe not necessary since we are debouncing the save)
-TODO: Need add Favicon.ico file
 TODO: need to add Trip Stats to the Info Panel
 TODO: Need to Add pagenation to the load trip modal
 TODO: Need Make a ITIN Page
@@ -21,4 +20,5 @@ TODO: Need To add summing of the directions
 
 
 Working on the following right now: 
-Favicon (add it so that it can be used)
+Summing up the distance and time 
+- It apears the route provides this information. so should be able import and convert. 

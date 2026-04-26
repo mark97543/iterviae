@@ -56,6 +56,8 @@ export const StopsProvider = ({ children }: { children: React.ReactNode }) => {
     const { user } = useAuth();
     const [focusedID, setFocusedID] = useState(null); // The focused ID for the map to use
 
+    console.log('Route:', route)
+
     // SIDE EFFECT: Wipe all mapping data out of memory on Logout
     useEffect(() => {
         if (!user) {

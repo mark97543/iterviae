@@ -65,22 +65,62 @@ const InfoStyle = `
         font-weight: 600;
     }
 
-    .info-stats {
+    .info-stats-container {
         margin-top: auto;
+        display: flex;
+        flex-direction: column;
+        gap: var(--gap-small);
         margin-bottom: var(--gap-medium);
         padding-top: var(--gap-medium);
         border-top: 1px solid var(--color-border);
+    }
+
+    .info-stats-grid {
         display: flex;
-        flex-direction: row;
-        justify-content: space-between;
+        gap: var(--gap-small);
+    }
+
+    .info-stat-card {
+        flex: 1;
+        background-color: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: 8px;
+        padding: var(--gap-medium) var(--gap-small);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
         align-items: center;
-        font-size: var(--font-size-small);
-        color: rgba(229, 229, 229, 0.6);
+        gap: 4px;
+        transition: var(--transition);
+        white-space: nowrap;
+        overflow: hidden;
+    }
+
+    .info-stat-card:hover {
+        border-color: var(--color-accent);
+        background-color: rgba(255, 255, 255, 0.02);
+    }
+
+    .info-stat-value {
+        color: var(--color-primary);
+        font-size: 1.4rem;
+        font-weight: 600;
+        margin: 0;
+        white-space: nowrap;
+    }
+
+    .info-stat-label {
+        color: rgba(229, 229, 229, 0.5);
+        font-size: var(--font-size-xsmall);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin: 0;
+        white-space: nowrap;
     }
 `;
 
 const Info = () =>{
-    const {editMode} = useStops();
+    const {editMode, route} = useStops();
     const {currentTrip,setCurrentTrip} = useDirectus();
 
     return (
@@ -109,9 +149,29 @@ const Info = () =>{
                         />
                     </div>
                     
-                    <div className='info-stats'>
-                        <span>Trip Statistics</span>
-                        <span>(Coming Soon)</span>
+                    <div className='info-stats-container'>
+                        <span className="info-label">Route Statistics</span>
+                        <div className='info-stats-grid'>
+                            <div className="info-stat-card">
+                                <p className="info-stat-label">Distance</p>
+                                <p className="info-stat-value">{route?.distance ? route.distance.toFixed(0) : '0'}<span style={{fontSize: '0.9rem', marginLeft: '3px', color: 'rgba(229, 229, 229, 0.5)'}}>mi</span></p>
+                            </div>
+                            <div className="info-stat-card">
+                                <p className="info-stat-label">Ride Time</p>
+                                <p className="info-stat-value">{route?.duration ? (
+                                    (() => {
+                                        const d = Number(route.duration);
+                                        const h = Math.floor(d / 3600);
+                                        const m = Math.floor(d % 3600 / 60);
+                                        return h > 0 ? (
+                                            <>{h}<span style={{fontSize: '0.9rem', margin: '0 3px', color: 'rgba(229, 229, 229, 0.5)'}}>h</span> {m}<span style={{fontSize: '0.9rem', marginLeft: '3px', color: 'rgba(229, 229, 229, 0.5)'}}>m</span></>
+                                        ) : (
+                                            <>{m}<span style={{fontSize: '0.9rem', marginLeft: '3px', color: 'rgba(229, 229, 229, 0.5)'}}>m</span></>
+                                        );
+                                    })()
+                                ) : '0m'}</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             ):(
@@ -121,9 +181,29 @@ const Info = () =>{
                         <p className="info-summary-text">{currentTrip.summary}</p>
                     )}
                     
-                    <div className='info-stats'>
-                        <span>Trip Statistics</span>
-                        <span>(Coming Soon)</span>
+                    <div className='info-stats-container'>
+                        <span className="info-label">Route Statistics</span>
+                        <div className='info-stats-grid'>
+                            <div className="info-stat-card">
+                                <p className="info-stat-label">Distance</p>
+                                <p className="info-stat-value">{route?.distance ? route.distance.toFixed(0) : '0'}<span style={{fontSize: '0.9rem', marginLeft: '3px', color: 'rgba(229, 229, 229, 0.5)'}}>mi</span></p>
+                            </div>
+                            <div className="info-stat-card">
+                                <p className="info-stat-label">Ride Time</p>
+                                <p className="info-stat-value">{route?.duration ? (
+                                    (() => {
+                                        const d = Number(route.duration);
+                                        const h = Math.floor(d / 3600);
+                                        const m = Math.floor(d % 3600 / 60);
+                                        return h > 0 ? (
+                                            <>{h}<span style={{fontSize: '0.9rem', margin: '0 3px', color: 'rgba(229, 229, 229, 0.5)'}}>h</span> {m}<span style={{fontSize: '0.9rem', marginLeft: '3px', color: 'rgba(229, 229, 229, 0.5)'}}>m</span></>
+                                        ) : (
+                                            <>{m}<span style={{fontSize: '0.9rem', marginLeft: '3px', color: 'rgba(229, 229, 229, 0.5)'}}>m</span></>
+                                        );
+                                    })()
+                                ) : '0m'}</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             )}
