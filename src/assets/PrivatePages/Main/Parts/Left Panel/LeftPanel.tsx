@@ -3,6 +3,7 @@ import LeftPanelSearch from "./Parts/LeftPanelSearch";
 import { useDirectus } from "../../../../../context/DirectusContext";
 import { useStops } from "../../../../../context/DataContext";
 import { useState } from "react";
+import Info from "./Parts/Info";
 
 
 const LeftPanel_Style = `
@@ -69,7 +70,7 @@ const LeftPanel_Style = `
 `;
 
 const LeftPanel = () =>{
-    const {saveTripByID} = useDirectus();
+    const {saveTripByID, currentTrip} = useDirectus();
     const {selectedTrip, editMode} = useStops();
     const [selectedTab, setSelectedTab] = useState(1); // Default to Stops tab
 
@@ -78,23 +79,25 @@ const LeftPanel = () =>{
         <div className="left-panel-wrapper">
             <style>{LeftPanel_Style}</style> 
             <div className='left-panel-tabs'>
-                <button className={`tab-btn ${selectedTab === 0 ? 'active' : ''}`} onClick={()=>setSelectedTab(0)}>Info</button>
-                <button className={`tab-btn ${selectedTab === 1 ? 'active' : ''}`} onClick={()=>setSelectedTab(1)}>Stops</button>
-                <button className={`tab-btn ${selectedTab === 2 ? 'active' : ''}`} onClick={()=>setSelectedTab(2)}>Itinerary</button>
+                <button className={`tab-btn ${selectedTab === 0 ? 'active' : ''}`} onClick={()=>setSelectedTab(0)} disabled={currentTrip ? false : true}>Info</button>
+                <button className={`tab-btn ${selectedTab === 1 ? 'active' : ''}`} onClick={()=>setSelectedTab(1)} disabled={currentTrip ? false : true}>Stops</button>
+                <button className={`tab-btn ${selectedTab === 2 ? 'active' : ''}`} onClick={()=>setSelectedTab(2)} disabled={currentTrip ? false : true}>Itinerary</button>
             </div>
     
             <div className="tab-content">
                 {selectedTab === 0 && (
-                    <div style={{color: 'var(--color-primary)', textAlign: 'center', marginTop: '20px'}}>
-                        <h4 style={{marginBottom: '5px'}}>Trip Info & Stats</h4>
-                        <small style={{opacity: 0.6}}>(Coming Soon)</small>
-                    </div>
+                    <Info/>
                 )}
-                
                 {selectedTab === 1 && (
                     <>
-                        <LeftPanelSearch/>
-                        <LeftPanelStops/>
+                        {currentTrip ? (
+                            <>
+                                <LeftPanelSearch/>
+                                <LeftPanelStops/>
+                            </>
+                        ):(
+                            <div style={{color: 'var(--color-primary)', textAlign: 'center', marginTop: '20px'}}>No Trip Selected</div>
+                        )}
                     </>
                 )}
 

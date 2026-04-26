@@ -41,7 +41,7 @@ const LEFT_PANEL_SEARCH_STYLE = `
 
 
 const LeftPanelSearch = () => {
-    const {setSearchStop, search, setSearch} = useStops();
+    const {setSearchStop, search, setSearch, editMode} = useStops();
     const{currentTrip} = useDirectus();
 
     //Enter Key event
@@ -61,18 +61,20 @@ const LeftPanelSearch = () => {
         <div className="left-panel-search-wrapper">
             <style>{LEFT_PANEL_SEARCH_STYLE}</style>
             {/* <h4 className="left-bar-title">{currentTrip?.trip_name || "Create or Load Trip"}</h4> */}
-            <div className="left-panel-search-bar">
-                <input 
-                    className="std-input" 
-                    type="text" 
-                    onFocus={(e) => e.target.select()} 
-                    placeholder="Search for location" 
-                    value={search} 
-                    onChange={(e) => setSearch(e.target.value)}
-                    onKeyDown={handleKeyDown}    
-                /> 
-                <button className="std-button panel-search-button" onClick={handleSearch}><img src="./search.png" alt="Search" /></button>
-            </div>
+            {editMode ? (
+                <div className="left-panel-search-bar">
+                    <input 
+                        className="std-input" 
+                        type="text" 
+                        onFocus={(e) => e.target.select()} 
+                        placeholder="Search for location" 
+                        value={search} 
+                        onChange={(e) => setSearch(e.target.value)}
+                        onKeyDown={handleKeyDown}    
+                    /> 
+                    <button className="std-button panel-search-button" onClick={handleSearch}><img src="./search.png" alt="Search" /></button>
+                </div>
+            ):(<></>)}
         </div>     
     )
 }
