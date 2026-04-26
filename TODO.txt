@@ -21,3 +21,4 @@ Need to set up a debounce autosave
 Need to Make Tabs for the left bar. (Trip info (thiw will include stats), stops, itin)
 Need to make the location a button to zoom in on the proper location when clicked
 Need incorperate a cancel save
+Need a favicon 

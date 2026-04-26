@@ -1,12 +1,15 @@
 import axios from 'axios';
 import { useStops } from './DataContext';
 import { useAuth } from './AuthContext';
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
+import { type Stop } from './DataContext';
 
 // ** New Interface for Trips **
 export interface Trip {
     id?: string;
-    trip_name?: string; 
+    trip_name?: string;
+    summary?: string;
+    stop?: Stop[];
 }
 
 
@@ -20,6 +23,14 @@ export const DirectusProvider = ({ children }: { children: React.ReactNode }) =>
     const [trips, setTrips] = useState<Trip[]>([]); /// All Trips for for this user 
     const [currentTrip, setCurrentTrip] = useState<Trip | null>(null); /// Selected Trip for this user
     const {stops,setEditMode} = useStops();
+
+    // Wipe session data when user logs out
+    useEffect(() => {
+        if (!user) {
+            setTrips([]);
+            setCurrentTrip(null);
+        }
+    }, [user]);
 
     //Save Trip to Directus Database
     const saveTrip = async (tripName: string) => {
@@ -92,7 +103,7 @@ export const DirectusProvider = ({ children }: { children: React.ReactNode }) =>
 
             const result = await axios.get(`https://api.wade-usa.com/items/trip`, {
                 params: {
-                    fields: 'id,trip_name,stop.id,stop.sort,stop.name,stop.longitude,stop.latitude,stop.note',
+                    fields: '*,stop.*',
                     filter: {
                         id: {
                             _eq: tripId
@@ -121,7 +132,7 @@ export const DirectusProvider = ({ children }: { children: React.ReactNode }) =>
 
     //Save Trip by ID
     const saveTripByID = async (tripId: string) => {
-        console.log(tripId)
+        //console.log(tripId)
         try {
             const token = sessionStorage.getItem('instrumentum_token');
             if (!token || !tripId) return null;
@@ -145,6 +156,7 @@ export const DirectusProvider = ({ children }: { children: React.ReactNode }) =>
 
             const result = await axios.patch(`https://api.wade-usa.com/items/trip/${tripId}`, {
                 trip_name: currentTrip?.trip_name,
+                summary: currentTrip?.summary,
                 stop: {
                     create: createStops,
                     update: updateStops

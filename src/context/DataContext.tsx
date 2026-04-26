@@ -17,6 +17,7 @@ export interface Stop {
 export interface TripData {
     id: string;
     trip_name: string;
+    summary?: string;
     stop: Stop[];
 }
 
@@ -60,6 +61,8 @@ export const StopsProvider = ({ children }: { children: React.ReactNode }) => {
             setShowSearchMenu(false);
             setSearch("");
             setRoute(null);
+            setSelectedTrip("");
+            setEditMode(false);
         }
     }, [user]);
 
