@@ -83,6 +83,8 @@ const MAP_STYLES = `
     }
 `;
 
+const MAP_POINT_ZOOM = 15;
+
 /**
  * THE CARTESIAN PLANE: MAP COMPONENT
  * This internal component handles the MapLibre engine.
@@ -253,7 +255,7 @@ const MapComponent = () => {
             const lngLat = data.marker.getLngLat();
             map.current.flyTo({
                 center: [lngLat.lng, lngLat.lat],
-                zoom: 10, // Zoom in to see the stop
+                zoom: MAP_POINT_ZOOM, // Zoom in to see the stop
                 duration: 2500, // Slightly longer duration for the dramatic fly animation
                 essential: true,
             });
