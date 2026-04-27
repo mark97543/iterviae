@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { STOP_TYPES, getStopType } from "../../../../../../constants/StopTypes";
+import { useDirectus } from "../../../../../../context/DirectusContext";
 
 
 const MARKER_POPUP_STYLE=`
@@ -142,6 +143,8 @@ const MarkerPopup = ({
     setStops, 
     editMode, 
     deleteWaypointByID,
+    saveTripByID,
+    currentTrip,
     arrivalTime,
     departureTime 
 }: { 
@@ -150,12 +153,31 @@ const MarkerPopup = ({
     setStops: any, 
     editMode: boolean, 
     deleteWaypointByID: any,
+    saveTripByID: any,
+    currentTrip: any,
     arrivalTime?: Date,
     departureTime?: Date
 }) =>{
 
+    const [draftPoint, setDraftPoint] = useState({...point});
     const [coordsText, setCoordsText] = useState(`${point.latitude}, ${point.longitude}`);
-    const stopType = getStopType(point.type);
+    const [budgetText, setBudgetText] = useState(point.budget?.toString() || '');
+    const [isSaving, setIsSaving] = useState(false);
+    
+    const stopType = getStopType(draftPoint.type);
+
+    const handleSave = async () => {
+        setIsSaving(true);
+        // 1. Update the global stops array in DataContext
+        const updatedStops = stops.map((s: any) => s.id === point.id ? draftPoint : s);
+        setStops(updatedStops);
+
+        // 2. Persist to Directus
+        if (currentTrip?.id) {
+            await saveTripByID(currentTrip.id, true, updatedStops);
+        }
+        setIsSaving(false);
+    };
 
     const handleCoordsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const val = e.target.value;
@@ -166,7 +188,7 @@ const MarkerPopup = ({
             const lat = parseFloat(parts[0].trim());
             const lng = parseFloat(parts[1].trim());
             if (!isNaN(lat) && !isNaN(lng)) {
-                setStops(stops.map((s: any) => s.id === point.id ? { ...s, latitude: lat, longitude: lng } : s));
+                setDraftPoint({ ...draftPoint, latitude: lat, longitude: lng });
             }
         }
     }
@@ -177,8 +199,16 @@ const MarkerPopup = ({
     };
 
     useEffect(() => {
-        setCoordsText(`${point.latitude}, ${point.longitude}`);
-    }, [point.latitude, point.longitude]);
+        setDraftPoint({...point});
+    }, [point]);
+
+    useEffect(() => {
+        setCoordsText(`${draftPoint.latitude}, ${draftPoint.longitude}`);
+    }, [draftPoint.latitude, draftPoint.longitude]);
+
+    useEffect(() => {
+        setBudgetText(draftPoint.budget?.toString() || '');
+    }, [draftPoint.budget]);
 
     return(
         <div className="marker-popup-wrapper">
@@ -186,7 +216,7 @@ const MarkerPopup = ({
             
             <div className="popup-header">
                 <h4 className="popup-title">
-                    {stopType.icon} {point.name || (editMode ? 'Edit Stop' : 'Waypoint')}
+                    {stopType.icon} {draftPoint.name || (editMode ? 'Edit Stop' : 'Waypoint')}
                 </h4>
                 <div className="popup-subtitle">
                     {Number(point.latitude).toFixed(5)}, {Number(point.longitude).toFixed(5)}
@@ -201,10 +231,10 @@ const MarkerPopup = ({
                             <input 
                                 className="input-dark" 
                                 type="text" 
-                                value={point.name || ''} 
+                                value={draftPoint.name || ''} 
                                 placeholder="e.g. Scenic Overlook"
                                 onFocus={(e) => e.target.select()}
-                                onChange={(e) => setStops(stops.map((s: any) => s.id === point.id ? { ...s, name: e.target.value } : s))} 
+                                onChange={(e) => setDraftPoint({ ...draftPoint, name: e.target.value })} 
                             />
                         </div>
 
@@ -213,8 +243,8 @@ const MarkerPopup = ({
                                 <span className="input-label">Type</span>
                                 <select 
                                     className="input-dark" 
-                                    value={point.type || 'waypoint'}
-                                    onChange={(e) => setStops(stops.map((s: any) => s.id === point.id ? { ...s, type: e.target.value } : s))}
+                                    value={draftPoint.type || 'waypoint'}
+                                    onChange={(e) => setDraftPoint({ ...draftPoint, type: e.target.value })}
                                 >
                                     {STOP_TYPES.map(type => (
                                         <option key={type.id} value={type.id}>{type.icon} {type.label}</option>
@@ -222,14 +252,14 @@ const MarkerPopup = ({
                                 </select>
                             </div>
                             
-                            {(point.type === 'start' || point.type === 'hotel') ? (
+                            {(draftPoint.type === 'start' || draftPoint.type === 'hotel') ? (
                                 <div style={{flex: 1}}>
                                     <span className="input-label">Departs</span>
                                     <input 
                                         className="input-dark" 
                                         type="time" 
-                                        value={point.start_time || '09:00'}
-                                        onChange={(e) => setStops(stops.map((s: any) => s.id === point.id ? { ...s, start_time: e.target.value } : s))} 
+                                        value={draftPoint.start_time || '09:00'}
+                                        onChange={(e) => setDraftPoint({ ...draftPoint, start_time: e.target.value })} 
                                     />
                                 </div>
                             ) : (
@@ -239,8 +269,8 @@ const MarkerPopup = ({
                                         className="input-dark" 
                                         type="number" 
                                         min="0"
-                                        value={point.stay_duration ?? ''}
-                                        onChange={(e) => setStops(stops.map((s: any) => s.id === point.id ? { ...s, stay_duration: e.target.value === '' ? undefined : parseInt(e.target.value) } : s))} 
+                                        value={draftPoint.stay_duration ?? ''}
+                                        onChange={(e) => setDraftPoint({ ...draftPoint, stay_duration: e.target.value === '' ? undefined : parseInt(e.target.value) })} 
                                     />
                                 </div>
                             )}
@@ -251,12 +281,45 @@ const MarkerPopup = ({
                             <textarea 
                                 className="input-dark" 
                                 style={{resize: 'none', height: '60px'}}
-                                value={point.note || ''} 
+                                value={draftPoint.note || ''} 
                                 placeholder="Add details..."
                                 onFocus={(e) => e.target.select()}
-                                onChange={(e) => setStops(stops.map((s: any) => s.id === point.id ? { ...s, note: e.target.value } : s))} 
+                                onChange={(e) => setDraftPoint({ ...draftPoint, note: e.target.value })} 
                             />
                         </div>
+
+                        <div className="input-group" style={{marginBottom: '15px'}}>
+                            <span className="input-label">Budget ($)</span>
+                            <input 
+                                className="input-dark" 
+                                type="text" 
+                                value={budgetText}
+                                placeholder="0.00"
+                                onFocus={(e) => e.target.select()}
+                                onChange={(e) => {
+                                    const val = e.target.value;
+                                    // Only allow numbers and one decimal point
+                                    if (val === '' || /^\d*\.?\d*$/.test(val)) {
+                                        setBudgetText(val);
+                                        // Update the main state only if it's a valid complete number or empty
+                                        if (val === '') {
+                                            setDraftPoint({ ...draftPoint, budget: undefined });
+                                        } else if (!val.endsWith('.')) {
+                                            setDraftPoint({ ...draftPoint, budget: parseFloat(val) });
+                                        }
+                                    }
+                                }} 
+                            />
+                        </div>
+
+                        <button 
+                            className="std-button" 
+                            style={{width: '100%', marginBottom: '10px'}} 
+                            onClick={handleSave}
+                            disabled={isSaving}
+                        >
+                            {isSaving ? 'Saving...' : 'Save Stop Details'}
+                        </button>
 
                         <button className="btn-delete" onClick={async () => await deleteWaypointByID(point.id)}>
                             Delete Waypoint
@@ -275,15 +338,24 @@ const MarkerPopup = ({
                             </div>
                         </div>
 
+                        {(point.budget > 0 || point.stay_duration > 0) && (
+                            <div style={{display: 'flex', gap: '10px', marginBottom: '12px'}}>
+                                {point.stay_duration > 0 && (
+                                    <div className="stay-badge" style={{margin: 0, flex: 1}}>
+                                        ⏱️ {point.stay_duration}m
+                                    </div>
+                                )}
+                                {point.budget > 0 && (
+                                    <div className="stay-badge" style={{margin: 0, flex: 1, borderColor: 'rgba(74, 222, 128, 0.3)', color: '#4ade80'}}>
+                                        💰 ${Number(point.budget).toLocaleString()}
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
                         <div style={{fontSize: '0.85rem', color: 'rgba(255,255,255,0.7)', lineHeight: '1.5', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '10px'}}>
                             {point.note || 'No notes for this stop.'}
                         </div>
-                        
-                        {point.stay_duration > 0 && (
-                            <div className="stay-badge">
-                                ⏱️ {point.stay_duration} Minute Stop
-                            </div>
-                        )}
                     </div>
                 )}
             </div>

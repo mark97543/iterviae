@@ -144,7 +144,7 @@ const MapComponent = () => {
     const markerRoots = useRef<Map<string, any>>(new Map());
     const [mapLoaded, setMapLoaded] = useState(false);
     const {stops, route, setStops, editMode, setRoute, focusedID, setSearchStop, setShowSearchMenu} = useStops();
-    const { deleteWaypointByID, currentTrip } = useDirectus();
+    const { deleteWaypointByID, currentTrip, saveTripByID } = useDirectus();
 
     // Use a ref for editMode so the map listeners (which are set once) can always see the current value
     const editModeRef = useRef(editMode);
@@ -274,12 +274,11 @@ const MapComponent = () => {
                 const stayMins = point.stay_duration || 0;
                 
                 let departureTime: Date;
-                // If it's a hotel, the departure is actually the start of the NEXT day
                 if (point.type === 'hotel' && index !== 0 && index !== stops.length - 1) {
                     currentDayOffset++;
                     const nextDayStr = getBaseDateStr(currentDayOffset);
                     departureTime = new Date(`${nextDayStr}T${point.start_time || '09:00'}:00`);
-                    runningTime = new Date(departureTime); // Sync running time to this new day's start
+                    runningTime = new Date(departureTime); 
                 } else if (point.type === 'start' && point.start_time) {
                     departureTime = new Date(`${getBaseDateStr(currentDayOffset)}T${point.start_time}:00`);
                     runningTime = new Date(departureTime);
@@ -288,13 +287,14 @@ const MapComponent = () => {
                     departureTime = new Date(runningTime);
                 }
 
-                // Add travel time to next stop
                 const leg = route?.legs?.[index];
                 if (leg) {
                     runningTime.setSeconds(runningTime.getSeconds() + leg.summary.time);
                 }
 
-                if (!markerRoots.current.has(point.id)) {
+                const existing = markerRoots.current.get(point.id);
+
+                if (!existing) {
                     const popupNode = document.createElement('div');
                     const root = createRoot(popupNode);
                     
@@ -309,50 +309,62 @@ const MapComponent = () => {
 
                     const m = new (window as any).maplibregl.Marker({ element: el, draggable: editMode, anchor: 'bottom' })
                         .setLngLat([point.longitude, point.latitude])
-                        .setPopup(new (window as any).maplibregl.Popup({ offset: 25 }).setDOMContent(popupNode))
+                        .setPopup(new (window as any).maplibregl.Popup({ offset: 25, maxWidth: 'none' }).setDOMContent(popupNode))
                         .addTo(map.current);
                         
                     m.on('dragend', () => {
                         const lngLat = m.getLngLat();
-                        // Use functional state update to prevent stale closures from when marker was created
                         setStops((prevStops: any[]) => prevStops.map((s: any) => 
                             s.id === point.id ? { ...s, latitude: lngLat.lat, longitude: lngLat.lng } : s
                         ));
                     });
-                        
-                    markerRoots.current.set(point.id, { root, marker: m, popupNode, element: el });
-                }
 
-                // Update the position, color, and icon
-                const data = markerRoots.current.get(point.id);
-                data.marker.setLngLat([point.longitude, point.latitude]);
-                data.marker.setDraggable(editMode);
-                
-                // Update HTML element visuals
-                if (data.element) {
-                    const head = data.element.querySelector('.marker-head');
-                    const tip = data.element.querySelector('.marker-tip');
-                    const iconSpan = data.element.querySelector('span');
+                    root.render(
+                        <MarkerPopup 
+                            point={point} 
+                            stops={stops} 
+                            setStops={setStops} 
+                            editMode={editMode} 
+                            deleteWaypointByID={deleteWaypointByID}
+                            saveTripByID={saveTripByID}
+                            currentTrip={currentTrip}
+                            arrivalTime={arrivalTime}
+                            departureTime={departureTime}
+                        />
+                    );
+
+                    markerRoots.current.set(point.id, { marker: m, root: root, popupNode: popupNode });
+                } else {
+                    // Update Existing
+                    existing.marker.setLngLat([point.longitude, point.latitude]);
+                    existing.marker.setDraggable(editMode);
                     
-                    if (head) head.style.backgroundColor = stopType.color;
+                    const el = existing.marker.getElement();
+                    const head = el.querySelector('.marker-head') as HTMLElement;
+                    const tip = el.querySelector('.marker-tip') as HTMLElement;
+                    if (head) {
+                        head.style.backgroundColor = stopType.color;
+                        head.innerHTML = `<span>${stopType.icon}</span>`;
+                    }
                     if (tip) tip.style.borderTopColor = stopType.color;
-                    if (iconSpan) iconSpan.innerHTML = stopType.icon;
-                }
 
-                data.root.render(
-                    <MarkerPopup 
-                        point={point} 
-                        stops={stops} 
-                        setStops={setStops} 
-                        editMode={editMode} 
-                        deleteWaypointByID={deleteWaypointByID}
-                        arrivalTime={arrivalTime}
-                        departureTime={departureTime}
-                    />
-                );
+                    existing.root.render(
+                        <MarkerPopup 
+                            point={point} 
+                            stops={stops} 
+                            setStops={setStops} 
+                            editMode={editMode} 
+                            deleteWaypointByID={deleteWaypointByID}
+                            saveTripByID={saveTripByID}
+                            currentTrip={currentTrip}
+                            arrivalTime={arrivalTime}
+                            departureTime={departureTime}
+                        />
+                    );
+                }
             }
         });
-    }, [stops, editMode]);
+    }, [stops, editMode, route, currentTrip, deleteWaypointByID, setStops]);
 
     // SIDE EFFECT: Listen for focus requests from the sidebar
     useEffect(() => {
@@ -380,7 +392,7 @@ const MapComponent = () => {
                 data.marker.togglePopup();
             }
         }
-    }, [focusedID, mapLoaded]);
+    }, [focusedID, mapLoaded, stops]); // Added stops here to handle race conditions during initial load
 
     // SIDE EFFECT: Draw Valhalla Route Polyline
     useEffect(() => {

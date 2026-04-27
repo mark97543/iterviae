@@ -36,26 +36,28 @@ const ITIN_STYLE = `
     .timeline {
         position: relative;
         padding-left: 30px;
+        margin-top: 20px;
     }
 
     .timeline::before {
         content: '';
         position: absolute;
-        left: 7px;
-        top: 10px;
-        bottom: 10px;
-        width: 2px;
-        background: linear-gradient(to bottom, var(--color-accent), rgba(249, 115, 22, 0.1));
+        left: 5px;
+        top: 0;
+        bottom: 0;
+        width: 1px;
+        background: rgba(255, 255, 255, 0.08); /* Dimmer vertical line */
+        z-index: 1;
     }
 
     .day-header {
         margin: 40px 0 20px -30px;
         color: var(--color-accent);
         font-weight: 800;
-        font-size: 1.1rem;
+        font-size: 0.85rem;
         display: flex;
         align-items: center;
-        gap: 15px;
+        gap: 12px;
         text-transform: uppercase;
         letter-spacing: 2px;
     }
@@ -64,81 +66,96 @@ const ITIN_STYLE = `
         content: '';
         flex: 1;
         height: 1px;
-        background: linear-gradient(to right, rgba(249, 115, 22, 0.4), transparent);
+        background: linear-gradient(to right, rgba(249, 115, 22, 0.2), transparent);
     }
 
     .stop-entry {
         position: relative;
-        margin-bottom: 30px;
+        margin-bottom: 12px; /* Tighter gap to metrics */
     }
 
     .stop-dot {
         position: absolute;
         left: -30px;
-        top: 5px;
-        width: 16px;
-        height: 16px;
+        top: 10px;
+        width: 10px;
+        height: 10px;
         background: #09090b;
-        border: 3px solid var(--color-accent);
+        border: 2px solid var(--color-accent);
         border-radius: 50%;
         z-index: 2;
-        box-shadow: 0 0 10px rgba(249, 115, 22, 0.4);
     }
 
     .stop-card {
-        background: rgba(255, 255, 255, 0.03);
+        background: #18181b; /* Lighter than panel for contrast */
         border: 1px solid rgba(255, 255, 255, 0.05);
-        border-radius: 8px;
-        padding: 12px;
-        transition: transform 0.2s ease;
+        border-radius: 12px;
+        padding: 16px;
+        transition: all 0.2s ease;
         cursor: pointer;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     }
 
     .stop-card:hover {
-        background: rgba(255, 255, 255, 0.05);
-        border-color: rgba(249, 115, 22, 0.3);
-        transform: translateX(5px);
+        background: #27272a;
+        border-color: var(--color-accent);
+        transform: translateX(4px);
     }
 
     .stop-top {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        margin-bottom: 4px;
+        margin-bottom: 2px;
     }
 
     .stop-name {
-        font-weight: 600;
+        font-weight: 700;
         color: #fff;
         font-size: 0.95rem;
+        margin-bottom: 2px;
+    }
+
+    .stop-meta {
+        font-size: 0.65rem;
+        color: rgba(255, 255, 255, 0.4);
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        font-weight: 600;
+        margin-bottom: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .stop-bottom {
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        padding-top: 12px;
     }
 
     .stop-time {
         font-size: 0.75rem;
         color: var(--color-accent);
-        font-weight: bold;
+        font-weight: 700;
+        font-family: 'JetBrains Mono', monospace;
     }
 
-    .stop-meta {
+    .stop-budget {
+        color: #4ade80; /* Brighter green */
         font-size: 0.75rem;
-        color: rgba(255,255,255,0.5);
-        font-style: italic;
     }
 
     .travel-metrics {
-        margin: 15px 0;
-        padding-left: 10px;
+        margin: 20px 0 20px 0; /* More vertical space */
         font-size: 0.75rem;
-        color: rgba(255,255,255,0.4);
+        color: rgba(255, 255, 255, 0.3);
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 10px;
+        font-weight: 500;
     }
 
     .travel-metrics::before {
         content: '↓';
-        font-size: 1rem;
-        color: var(--color-accent);
+        font-size: 0.9rem;
+        color: rgba(249, 115, 22, 0.4);
     }
 
     .empty-state {
@@ -294,16 +311,23 @@ const Itin = () => {
                                                 <div className="stop-dot" style={{borderColor: stopType.color}}></div>
                                                 <div className="stop-card" onClick={() => setFocusedID(stop.id)}>
                                                     <div className="stop-top">
-                                                        <div className="stop-name">{stopType.icon} {stop.name || "Unnamed Stop"}</div>
+                                                        <div className="stop-name">{stopType.icon} {stop.name || (stop.type === 'start' ? 'Trip Start' : 'Waypoint')}</div>
+                                                    </div>
+                                                    <div className="stop-meta">
+                                                        <span>{stopType.label}</span>
+                                                        {stop.budget > 0 && (
+                                                            <span className="stop-budget">
+                                                                ${Number(stop.budget).toLocaleString()}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                    <div className="stop-bottom">
                                                         <div className="stop-time">
                                                             {formatTime(arrivalTime)}
                                                             {stayMins > 0 && ` - ${formatTime(departureTime)}`}
                                                         </div>
                                                     </div>
-                                                    <div className="stop-meta">
-                                                        {stopType.label}
-                                                    </div>
-                                                    {stop.note && <div style={{marginTop: '8px', fontSize: '0.8rem', color: 'rgba(255,255,255,0.7)'}}>{stop.note}</div>}
+                                                    {stop.note && <div style={{marginTop: '10px', fontSize: '0.8rem', color: 'rgba(255,255,255,0.6)', borderTop: '1px solid rgba(255,255,255,0.03)', paddingTop: '8px'}}>{stop.note}</div>}
                                                 </div>
                                             </div>
 

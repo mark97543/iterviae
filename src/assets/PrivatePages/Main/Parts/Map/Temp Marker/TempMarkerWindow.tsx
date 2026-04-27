@@ -77,7 +77,7 @@ const TEMP_MARKER_WINDOW_STYLE=`
 const TempMarkerWindow = () =>{
 
     const {stops,setStops,searchStop, setShowSearchMenu, setSearchStop, setSearch, route, setRoute, editMode} = useStops();
-    const {currentTrip, saveTripByID} = useDirectus();
+    // const {currentTrip, saveTripByID} = useDirectus();
 
     const [isAdding, setIsAdding] = useState(false);
 
@@ -93,7 +93,7 @@ const TempMarkerWindow = () =>{
             longitude: searchStop.long,
             type: "waypoint",
             stay_duration: 0,
-            order: stops.length + 1
+            sort: (stops.length > 0 ? Math.max(...stops.map(s => s.sort || 0)) : 0) + 1
         }
         
         // Calculate the brand new array of stops synchronously
@@ -105,11 +105,6 @@ const TempMarkerWindow = () =>{
         setSearch("");
         setRoute(null);
         
-        // Push the new point to the database silently so we stay in edit mode
-        if (currentTrip && currentTrip.id) {
-            await saveTripByID(currentTrip.id, true, updatedStops);
-        }
-
         // Pass the calculated array so Valhalla sees the new stop instantly!
         const m = await getTripDirections(updatedStops);
         if (m) {

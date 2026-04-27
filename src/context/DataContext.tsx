@@ -1,4 +1,4 @@
-import { useState, createContext, useContext, useEffect } from "react";
+import { useState, createContext, useContext, useEffect, useMemo } from "react";
 import { useAuth } from "./AuthContext";
 
 // 1. Data Structure for a Stop
@@ -12,7 +12,8 @@ export interface Stop {
     type?: string;
     stay_duration?: number; // In minutes
     start_time?: string; // e.g. "09:00" - used for Start and Hotel types
-    order?: number;
+    budget?: number;
+    sort?: number;
 }
 
 // Interface for the trip data structure
@@ -58,6 +59,11 @@ export const StopsProvider = ({ children }: { children: React.ReactNode }) => {
     const { user } = useAuth();
     const [focusedID, setFocusedID] = useState(null); // The focused ID for the map to use
 
+    // Sort stops by the "sort" field
+    const sortedStops = useMemo(() => {
+        return [...stops].sort((a, b) => (a.sort || 0) - (b.sort || 0));
+    }, [stops]);
+
     // SIDE EFFECT: Wipe all mapping data out of memory on Logout
     useEffect(() => {
         if (!user) {
@@ -75,7 +81,7 @@ export const StopsProvider = ({ children }: { children: React.ReactNode }) => {
 
     return (
         <StopsContext.Provider value={{ 
-            stops, 
+            stops: sortedStops, 
             setStops, 
             searchStop, 
             setSearchStop, 
