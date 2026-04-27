@@ -143,7 +143,7 @@ const MapComponent = () => {
     const map = useRef<any>(null);
     const markerRoots = useRef<Map<string, any>>(new Map());
     const [mapLoaded, setMapLoaded] = useState(false);
-    const {stops, route, setStops, editMode, setRoute, focusedID, setSearchStop, setShowSearchMenu} = useStops();
+    const {stops, route, setStops, editMode, setRoute, focusedID, setFocusedID, setSearchStop, setShowSearchMenu} = useStops();
     const { deleteWaypointByID, currentTrip, saveTripByID } = useDirectus();
 
     // Use a ref for editMode so the map listeners (which are set once) can always see the current value
@@ -206,11 +206,17 @@ const MapComponent = () => {
                 setShowSearchMenu(true);
             });
 
-            // Left Click to clear the temporary marker
+            // Left Click to clear the temporary marker and break focus
             map.current.on('click', () => {
                 console.log("Map background clicked! Clearing temp marker...");
                 setSearchStop(null);
                 setShowSearchMenu(false);
+                setFocusedID(null);
+            });
+
+            // If the user manually drags the map, break the focus so they can click the sidebar to re-center
+            map.current.on('dragstart', () => {
+                setFocusedID(null);
             });
             
            map.current.addControl(new (window as any).maplibregl.FullscreenControl(), 'bottom-right');
@@ -233,7 +239,10 @@ const MapComponent = () => {
     // SIDE EFFECT: Fetch Valhalla Route
     // We debounce this so we don't spam the API while the user is typing coordinates
     useEffect(() => {
-        if (!stops || stops.length < 2) return;
+        if (!stops || stops.length < 2) {
+            setRoute(null);
+            return;
+        }
         
         const timer = setTimeout(async () => {
             try {
@@ -315,10 +324,23 @@ const MapComponent = () => {
                         <div class="marker-tip" style="border-top-color: ${stopType.color};"></div>
                     `;
 
+                    const popup = new (window as any).maplibregl.Popup({ offset: 25, maxWidth: 'none' }).setDOMContent(popupNode);
+
                     const m = new (window as any).maplibregl.Marker({ element: el, draggable: editMode, anchor: 'bottom' })
                         .setLngLat([point.longitude, point.latitude])
-                        .setPopup(new (window as any).maplibregl.Popup({ offset: 25, maxWidth: 'none' }).setDOMContent(popupNode))
+                        .setPopup(popup)
                         .addTo(map.current);
+                        
+                    // Race condition fix: If this is the focusedID (but wasn't loaded yet), fly to it now!
+                    if (point.id === focusedID) {
+                        map.current.flyTo({
+                            center: [point.longitude, point.latitude],
+                            zoom: MAP_POINT_ZOOM,
+                            duration: 2500,
+                            essential: true,
+                        });
+                        m.togglePopup();
+                    }
                         
                     m.on('dragend', () => {
                         const lngLat = m.getLngLat();
@@ -395,12 +417,13 @@ const MapComponent = () => {
                 duration: 2500, // Slightly longer duration for the dramatic fly animation
                 essential: true,
             });
+            
             // Optional: Automatically open the popup when focused
             if (!data.marker.getPopup().isOpen()) {
                 data.marker.togglePopup();
             }
         }
-    }, [focusedID, mapLoaded, stops]); // Added stops here to handle race conditions during initial load
+    }, [focusedID, mapLoaded]); // Removed stops here so typing DOES NOT trigger the camera snap
 
     // SIDE EFFECT: Draw Valhalla Route Polyline
     useEffect(() => {

@@ -10,6 +10,7 @@ import Register from './assets/PublicPages/Register/Register'
 import Pending from './assets/PublicPages/Pending/Pending'
 import MissingPage from './assets/PublicPages/404Page/MissingPage'
 import { DirectusProvider } from './context/DirectusContext'
+import A4Page from './assets/PrivatePages/Print/A5Page'
 
 function App() {
 
@@ -23,6 +24,7 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/pending" element={<Pending />} />
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            <Route path="/a4print" element={<ProtectedRoute><A4Page /></ProtectedRoute>} />
             <Route path="*" element={<MissingPage />} />
           </Routes>
         </DirectusProvider>

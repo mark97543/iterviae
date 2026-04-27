@@ -6,6 +6,7 @@ import { useDirectus } from '../../../../../context/DirectusContext';
 import EditTripModal from './Parts/EditTripModal';
 import LoadTripModal from './Parts/LoadTripModal';
 import { useStops } from '../../../../../context/DataContext';
+import { useNavigate } from 'react-router-dom';
 
 const BOTTOM_PANEL_STYLE=`
     .bottom-panel-wrapper{
@@ -42,13 +43,7 @@ const BottomPanel = () => {
     const [showLoadTripModal, setShowLoadTripModal] = useState(false);
     const {editMode, setEditMode} = useStops()
     const {currentTrip} = useDirectus()
-
-
-    
-
-
-
-
+    const navigate = useNavigate();
 
     return(
         <div className="bottom-panel-wrapper">
@@ -74,6 +69,12 @@ const BottomPanel = () => {
             <Tippy content="Open Trips">
                 <button className="std-button new-trip-btn" onClick={() => setShowLoadTripModal(!showLoadTripModal)}>
                     <img src="./open.png"/>
+                </button>
+            </Tippy>
+
+            <Tippy content="Print A4">
+                <button className="std-button new-trip-btn" onClick={()=>window.open(`/a4print?tripId=${currentTrip?.id}`, '_blank')}>
+                    <img src="./print.png"/>
                 </button>
             </Tippy>
 

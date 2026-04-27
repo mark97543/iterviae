@@ -191,8 +191,8 @@ export const DirectusProvider = ({ children }: { children: React.ReactNode }) =>
                 trip_name: currentTrip?.trip_name,
                 status: currentTrip?.status,
                 summary: currentTrip?.summary,
-                distance: route?.distance ? Number(route.distance) : undefined,
-                ride_time: route?.duration ? Number(route.duration) : undefined,
+                distance: route ? Number(route.distance) : 0,
+                ride_time: route ? Number(route.duration) : 0,
                 start_date: currentTrip?.start_date || null,
                 route_data: route ? JSON.stringify(route) : null,
             };
