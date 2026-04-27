@@ -93,7 +93,7 @@ const MapComponent = () => {
     const map = useRef<any>(null);
     const markerRoots = useRef<Map<string, any>>(new Map());
     const [mapLoaded, setMapLoaded] = useState(false);
-    const {stops, route, setStops, editMode, setRoute, focusedID} = useStops();
+    const {stops, route, setStops, editMode, setRoute, focusedID, setSearchStop, setShowSearchMenu} = useStops();
     const { deleteWaypointByID } = useDirectus();
 
 
@@ -125,6 +125,27 @@ const MapComponent = () => {
                 center: [-114.35, 43.5], // Centered on the Western US
                 zoom: 5, // Zoomed out to show the region
             });
+
+            //Right Clck Add Point to route
+            map.current.on('contextmenu', (e:any)=>{
+                // This prevents default browser menu
+                e.preventDefault();
+
+                //The coordinated of where clicked  
+                const lngLat = e.lngLat;
+
+                //Use context functions to trigger temp marker
+                setSearchStop({lat: lngLat.lat, long: lngLat.lng});
+                setShowSearchMenu(true);
+            });
+
+            // Left Click to clear the temporary marker
+            map.current.on('click', () => {
+                console.log("Map background clicked! Clearing temp marker...");
+                setSearchStop(null);
+                setShowSearchMenu(false);
+            });
+            
            map.current.addControl(new (window as any).maplibregl.FullscreenControl(), 'bottom-right');
            map.current.addControl(new (window as any).maplibregl.NavigationControl(), 'bottom-right');
            
@@ -137,6 +158,8 @@ const MapComponent = () => {
         return ()=>{
             if (map.current) map.current.remove();
         }
+
+
 
     },[])
 

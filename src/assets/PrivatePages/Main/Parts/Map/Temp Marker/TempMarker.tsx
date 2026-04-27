@@ -19,8 +19,9 @@ const TempMarker = ({map}: {map: any}) =>{
     //SIDE EFFECT: Display Temporary Search Point
     useEffect(()=>{
         
-        //Eixt if map is not ready or coordinated are missing
+        //Exit if map is not ready or coordinates are missing
         if(!map.current || !searchStop || !searchStop.long || !searchStop.lat){
+            console.log("Removing Temp Marker...");
             if (searchMarker.current) searchMarker.current.remove();
             if (popupRef.current) popupRef.current.remove();
             return;
@@ -60,6 +61,12 @@ const TempMarker = ({map}: {map: any}) =>{
         });
 
         searchMarker.current = marker;
+        popupRef.current = popup;
+
+        // NEW: If the menu should be shown (e.g. from a right-click), add the popup to the map immediately
+        if (showSearchMenu) {
+            popup.addTo(map.current);
+        }
 
         //Center map on new marker
         map.current.flyTo({

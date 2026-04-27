@@ -25,8 +25,8 @@ export interface TripData {
 interface StopsContextType {
     stops: Stop[];
     setStops: React.Dispatch<React.SetStateAction<Stop[]>>;
-    searchStop: {long?:any, lat?:any, address?:any};
-    setSearchStop: React.Dispatch<React.SetStateAction<{long?:any, lat?:any}>>;
+    searchStop: {long?:any, lat?:any, address?:any} | null;
+    setSearchStop: React.Dispatch<React.SetStateAction<{long?:any, lat?:any} | null>>;
     showSearchMenu: boolean;
     setShowSearchMenu: React.Dispatch<React.SetStateAction<boolean>>;
     search: string;
@@ -47,7 +47,7 @@ export const StopsContext = createContext<StopsContextType | null>(null);
 // 4. Create the Provider Component
 export const StopsProvider = ({ children }: { children: React.ReactNode }) => {
     const [stops, setStops] = useState<Stop[]>([]); //The stops for the current trip 
-    const [searchStop, setSearchStop] = useState({long:null, lat:null}); // The stop that is being searched for 
+    const [searchStop, setSearchStop] = useState<{long?:any, lat?:any} | null>(null); // The stop that is being searched for 
     const [showSearchMenu, setShowSearchMenu] = useState(false); // Whether the search menu is open 
     const [search, setSearch] = useState(""); // The search term for waypoints
     const [route, setRoute] = useState(null); // The route for the current trip 

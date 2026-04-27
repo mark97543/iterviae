@@ -16,6 +16,7 @@ const InfoStyle = `
         display: flex;
         flex-direction: column;
         padding-top: var(--gap-small);
+        min-height: 0;
     }
 
     .info-label {
@@ -38,6 +39,27 @@ const InfoStyle = `
         flex-direction: column;
         flex: 1;
         margin-bottom: var(--gap-medium);
+        min-height: 0;
+        overflow-y: auto;
+        direction: rtl; /* Moves scrollbar to left */
+        padding-left: 4px;
+    }
+
+    .info-description-group::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .info-description-group::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .info-description-group::-webkit-scrollbar-thumb {
+        background: var(--color-border);
+        border-radius: 10px;
+    }
+
+    .info-description-group::-webkit-scrollbar-thumb:hover {
+        background: var(--color-accent);
     }
 
     .info-summary-textarea {
@@ -45,17 +67,34 @@ const InfoStyle = `
         resize: none;
         width: 100%;
         box-sizing: border-box;
+        direction: ltr; /* Resets text direction */
+        border: none;
+        background: transparent;
+        box-shadow: none;
+        padding-left: var(--gap-small);
+        border-left: 2px solid var(--color-accent);
+        font-size: var(--font-size-xsmall);
+        font-style: italic;
+        color: var(--color-text);
+        font-family: var(--font-main);
+    }
+
+    .info-summary-textarea:focus {
+        border-left: 2px solid var(--color-primary);
+        box-shadow: none;
     }
 
     .info-summary-text {
         color: var(--color-primary);
         opacity: 0.8;
-        font-size: var(--font-size-small);
+        font-size: var(--font-size-xsmall);
+        font-style: italic;
         line-height: 1.5;
         white-space: pre-wrap;
-        margin: 0 0 var(--gap-medium) 0;
+        margin: 0;
         padding-left: var(--gap-small);
         border-left: 2px solid var(--color-accent);
+        direction: ltr; /* Resets text direction */
     }
 
     .info-title {
@@ -245,7 +284,9 @@ const Info = () =>{
                     <h3 className="info-title" style={{marginTop: 0}}>{currentTrip?.trip_name || 'Unnamed Trip'}</h3>
                     
                     {currentTrip?.summary && (
-                        <p className="info-summary-text">{currentTrip.summary}</p>
+                        <div className="info-description-group">
+                            <p className="info-summary-text">{currentTrip.summary}</p>
+                        </div>
                     )}
                     
                     <div className='info-stats-container'>

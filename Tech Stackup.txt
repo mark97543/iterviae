@@ -22,3 +22,7 @@ This document outlines the complete, self-hosted technology stack for IterViae. 
   - **Operating System**: Ubuntu 24.04 LTS.
 - **Server Management**: Easypanel. A Docker-based visual control panel that simplifies the management of all services, volumes, and SSL certificates.
 - **Containerization**: Docker. The entire stack is containerized and cleanly separated into specialized microservices (e.g., `valhalla`, `directus`, `instrumentum-map-data`, and the frontend application).
+
+## 5. Search, Geocoding & POI (Discovery Layer)
+- **Primary Search Engine**: Photon (Public API: `photon.komoot.io`). Provides client-side, lightning-fast geocoding and address search. Using the public API allows us to scale to thousands of users without consuming VPS RAM or Disk space.
+- **POI Provider**: Overpass API. Used for dynamic discovery of motorcycle-specific points of interest (Gas Stations, Hotels, Restaurants) along the active route.

@@ -107,6 +107,7 @@ const TempMarkerWindow = () =>{
 
     const closeWindow = () =>{
         setShowSearchMenu(false);
+        setSearchStop({long: null, lat: null});
     }
 
     if (!searchStop) return null;

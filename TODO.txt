@@ -15,7 +15,8 @@ TODO: Cancel Save Button (Maybe not necessary since we are debouncing the save)
 TODO: Need to Add pagenation to the load trip modal
 TODO: Need Make a ITIN Page
 TODO: Search For the Open Trip MOdal
-
+TODO: When Shirking Screen the LoadTripMOdal table goes off the screen Need to set minim screen size (Mayne make this work in mobile and tablet view)
+TODO: When Shrinking the screen the user panel needs to be shrinkable to allow more room for the map (Maybe this could be fixed in mobile and tablet views)
 
 Working on the following right now: 
-add Trip Stats to the Directus schema to include i nthe load trip modal 
+Working on left click menu to add a point while live. 
