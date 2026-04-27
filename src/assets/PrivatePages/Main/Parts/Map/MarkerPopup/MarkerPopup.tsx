@@ -131,6 +131,7 @@ const MarkerPopup = ({ point, stops, setStops, editMode, deleteWaypointByID }: {
                         type="text" 
                         value={point.name || ''} 
                         placeholder="e.g. Grand Canyon"
+                        onFocus={(e) => e.target.select()}
                         onChange={(e) => setStops(stops.map((s: any) => s.id === point.id ? { ...s, name: e.target.value } : s))} 
                     />
 
@@ -140,6 +141,7 @@ const MarkerPopup = ({ point, stops, setStops, editMode, deleteWaypointByID }: {
                         type="text" 
                         value={coordsText} 
                         placeholder="e.g. 38.8951, -77.0369"
+                        onFocus={(e) => e.target.select()}
                         onChange={handleCoordsChange}
                     />
                     <span className="input-label" style={{marginTop: '4px'}}>Notes</span>
@@ -148,6 +150,7 @@ const MarkerPopup = ({ point, stops, setStops, editMode, deleteWaypointByID }: {
                         style={{resize: 'none', height: '60px', marginBottom: 0}}
                         value={point.note    || ''} 
                         placeholder="Add details about this stop..."
+                        onFocus={(e) => e.target.select()}
                         onChange={(e) => setStops(stops.map((s: any) => s.id === point.id ? { ...s, note: e.target.value } : s))} 
                     />
                     <button className="std-button" style={{marginTop: '4px'}} onClick={async () => await deleteWaypointByID(point.id)}>Delete</button>

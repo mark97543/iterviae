@@ -18,7 +18,7 @@ TODO: Search For the Open Trip MOdal
 TODO: When Shirking Screen the LoadTripMOdal table goes off the screen Need to set minim screen size (Mayne make this work in mobile and tablet view)
 TODO: When Shrinking the screen the user panel needs to be shrinkable to allow more room for the map (Maybe this could be fixed in mobile and tablet views)
 TODO: Directus somthing to cleanup all stops with no coresponding trip
-TODO: Trip stop edit popup needs to be select all on celection of the input
+
 
 
 Working on the following right now: 
