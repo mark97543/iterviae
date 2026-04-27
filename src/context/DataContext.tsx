@@ -8,8 +8,10 @@ export interface Stop {
     address?: string;
     latitude?: number;
     longitude?: number;
-    notes?: string;
-    type?: 'waypoint' | 'hotel' | 'gas' | 'food' | 'attraction' | 'start' | 'end';
+    note?: string;
+    type?: string;
+    stay_duration?: number; // In minutes
+    start_time?: string; // e.g. "09:00" - used for Start and Hotel types
     order?: number;
 }
 

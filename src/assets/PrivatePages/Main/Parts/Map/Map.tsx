@@ -6,6 +6,7 @@ import polyline from '@mapbox/polyline';
 import MarkerPopup from './MarkerPopup/MarkerPopup';
 import { getTripDirections } from '../../valhala';
 import { useDirectus } from '../../../../../context/DirectusContext';
+import { getStopType } from '../../../../../constants/StopTypes';
 /**
  * CLASSICAL MECHANICS: UI STYLING
  * Defining the visual boundaries of the application.
@@ -36,6 +37,37 @@ const MAP_STYLES = `
         top: 0;
         bottom: 0;
         width: 100%;
+    }
+
+    .custom-marker {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 32px;
+        height: 42px; /* Taller to accommodate the tip */
+        cursor: pointer;
+        filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4));
+    }
+
+    .marker-head {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        border: 2px solid #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        z-index: 2;
+    }
+
+    .marker-tip {
+        width: 0;
+        height: 0;
+        border-left: 6px solid transparent;
+        border-right: 6px solid transparent;
+        border-top: 10px solid #fff; /* We will color this with JS to match the head */
+        margin-top: -1px; /* Slight overlap to prevent gaps */
     }
 
     .map-overlay-card {
@@ -81,6 +113,22 @@ const MAP_STYLES = `
     .maplibregl-marker {
         cursor: pointer;
     }
+
+    /* POPUP RESET: Kill the default MapLibre white box */
+    .maplibregl-popup-content {
+        background: none !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+    }
+
+    .maplibregl-popup-tip {
+        display: none !important; /* Hide the default tip since we have our own needle */
+    }
+
+    .maplibregl-popup-close-button {
+        display: none !important; /* Hide the default close button */
+    }
 `;
 
 const MAP_POINT_ZOOM = 15;
@@ -96,7 +144,7 @@ const MapComponent = () => {
     const markerRoots = useRef<Map<string, any>>(new Map());
     const [mapLoaded, setMapLoaded] = useState(false);
     const {stops, route, setStops, editMode, setRoute, focusedID, setSearchStop, setShowSearchMenu} = useStops();
-    const { deleteWaypointByID } = useDirectus();
+    const { deleteWaypointByID, currentTrip } = useDirectus();
 
     // Use a ref for editMode so the map listeners (which are set once) can always see the current value
     const editModeRef = useRef(editMode);
@@ -206,14 +254,60 @@ const MapComponent = () => {
             }
         }
 
+        // Time Tracking Logic for Popups
+        let currentDayOffset = 0;
+        const getBaseDateStr = (offset: number) => {
+            const d = new Date(currentTrip?.start_date || new Date());
+            d.setDate(d.getDate() + offset);
+            return d.toISOString().split('T')[0];
+        };
+
+        let runningTime = new Date(`${getBaseDateStr(0)}T09:00:00`);
+
         // 2. Create new markers or update existing ones
-        stops.forEach((point: any) => {
+        stops.forEach((point: any, index: number) => {
             if (point.longitude && point.latitude) {
+                const stopType = getStopType(point.type);
+
+                // Handle Time Tracking
+                const arrivalTime = new Date(runningTime);
+                const stayMins = point.stay_duration || 0;
+                
+                let departureTime: Date;
+                // If it's a hotel, the departure is actually the start of the NEXT day
+                if (point.type === 'hotel' && index !== 0 && index !== stops.length - 1) {
+                    currentDayOffset++;
+                    const nextDayStr = getBaseDateStr(currentDayOffset);
+                    departureTime = new Date(`${nextDayStr}T${point.start_time || '09:00'}:00`);
+                    runningTime = new Date(departureTime); // Sync running time to this new day's start
+                } else if (point.type === 'start' && point.start_time) {
+                    departureTime = new Date(`${getBaseDateStr(currentDayOffset)}T${point.start_time}:00`);
+                    runningTime = new Date(departureTime);
+                } else {
+                    runningTime.setMinutes(runningTime.getMinutes() + stayMins);
+                    departureTime = new Date(runningTime);
+                }
+
+                // Add travel time to next stop
+                const leg = route?.legs?.[index];
+                if (leg) {
+                    runningTime.setSeconds(runningTime.getSeconds() + leg.summary.time);
+                }
+
                 if (!markerRoots.current.has(point.id)) {
                     const popupNode = document.createElement('div');
                     const root = createRoot(popupNode);
                     
-                    const m = new (window as any).maplibregl.Marker({ color: '#000000ff', draggable: editMode })
+                    const el = document.createElement('div');
+                    el.className = 'custom-marker';
+                    el.innerHTML = `
+                        <div class="marker-head" style="background-color: ${stopType.color};">
+                            <span>${stopType.icon}</span>
+                        </div>
+                        <div class="marker-tip" style="border-top-color: ${stopType.color};"></div>
+                    `;
+
+                    const m = new (window as any).maplibregl.Marker({ element: el, draggable: editMode, anchor: 'bottom' })
                         .setLngLat([point.longitude, point.latitude])
                         .setPopup(new (window as any).maplibregl.Popup({ offset: 25 }).setDOMContent(popupNode))
                         .addTo(map.current);
@@ -226,14 +320,36 @@ const MapComponent = () => {
                         ));
                     });
                         
-                    markerRoots.current.set(point.id, { root, marker: m, popupNode });
+                    markerRoots.current.set(point.id, { root, marker: m, popupNode, element: el });
                 }
 
-                // Update the position and re-render the React Component with fresh props
+                // Update the position, color, and icon
                 const data = markerRoots.current.get(point.id);
                 data.marker.setLngLat([point.longitude, point.latitude]);
-                data.marker.setDraggable(editMode); // Dynamically toggle draggable state
-                data.root.render(<MarkerPopup point={point} stops={stops} setStops={setStops} editMode={editMode} deleteWaypointByID={deleteWaypointByID} />);
+                data.marker.setDraggable(editMode);
+                
+                // Update HTML element visuals
+                if (data.element) {
+                    const head = data.element.querySelector('.marker-head');
+                    const tip = data.element.querySelector('.marker-tip');
+                    const iconSpan = data.element.querySelector('span');
+                    
+                    if (head) head.style.backgroundColor = stopType.color;
+                    if (tip) tip.style.borderTopColor = stopType.color;
+                    if (iconSpan) iconSpan.innerHTML = stopType.icon;
+                }
+
+                data.root.render(
+                    <MarkerPopup 
+                        point={point} 
+                        stops={stops} 
+                        setStops={setStops} 
+                        editMode={editMode} 
+                        deleteWaypointByID={deleteWaypointByID}
+                        arrivalTime={arrivalTime}
+                        departureTime={departureTime}
+                    />
+                );
             }
         });
     }, [stops, editMode]);

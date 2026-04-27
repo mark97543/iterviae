@@ -1,21 +1,32 @@
 import { useState, useEffect } from "react";
+import { STOP_TYPES, getStopType } from "../../../../../../constants/StopTypes";
 
 
 const MARKER_POPUP_STYLE=`
     .marker-popup-wrapper {
-        width: 240px;
-        background: var(--color-surface);
-        border: 1px solid var(--color-border);
-        border-radius: 8px;
+        width: 320px;
+        background: rgba(9, 9, 11, 0.9);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
         z-index: 100;
-        box-shadow: 0 12px 28px -6px rgba(0, 0, 0, 0.8);
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
-        padding: 16px;
+        box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.9);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        padding: 0; /* Removing padding to use internal sections */
         color: var(--color-text);
         font-family: var(--font-main);
         position: relative;
         overflow: hidden;
+    }
+
+    .popup-header {
+        background: rgba(255, 255, 255, 0.03);
+        padding: 16px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .popup-body {
+        padding: 16px;
     }
 
     /* Accent Line */
@@ -25,84 +36,131 @@ const MARKER_POPUP_STYLE=`
         top: 0;
         left: 0;
         width: 100%;
-        height: 3px;
-        background: var(--color-accent);
-    }
-
-    /* Hide the default MapLibre close button and styling */
-    .maplibregl-popup-content {
-        background: none !important;
-        border: none !important;
-        border-radius: 0 !important;
-        box-shadow: none !important;
-        padding: 0 !important;
-    }
-    
-    .maplibregl-popup-tip {
-        border-top-color: var(--color-surface) !important;
-    }
-
-    .marker-popup-edit, .marker-popup-view {
-        display: flex;
-        flex-direction: column;
-        width: 100%;
-        box-sizing: border-box;
+        height: 4px;
+        background: linear-gradient(90deg, var(--color-accent), #f97316);
+        z-index: 10;
     }
 
     .popup-title {
-        margin: 0 0 8px 0;
-        color: var(--color-primary);
-        font-size: var(--font-size-medium);
-        font-weight: 600;
-        line-height: 1.2;
+        margin: 0;
+        color: #fff;
+        font-size: 1.1rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 8px;
     }
 
-    .popup-notes {
-        margin: 0;
-        color: rgba(229, 229, 229, 0.7);
-        font-size: var(--font-size-xsmall);
-        line-height: 1.4;
+    .popup-subtitle {
+        font-size: 0.7rem;
+        color: rgba(255, 255, 255, 0.4);
+        margin-top: 4px;
+        font-family: monospace;
+    }
+
+    .input-group {
+        margin-bottom: 15px;
     }
 
     .input-dark {
-        background: rgba(0, 0, 0, 0.2);
-        border: 1px solid var(--color-border);
-        border-radius: 4px;
-        color: var(--color-primary);
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 6px;
+        color: #fff;
         width: 100%;
-        padding: 8px 10px;
-        font-family: var(--font-main);
-        font-size: var(--font-size-small);
+        padding: 10px 12px;
+        font-size: 0.85rem;
         box-sizing: border-box;
-        transition: var(--transition);
-        margin-bottom: 12px;
+        transition: all 0.2s ease;
     }
 
     .input-dark:focus {
         outline: none;
         border-color: var(--color-accent);
-        background: rgba(0, 0, 0, 0.4);
+        background: rgba(0, 0, 0, 0.5);
+        box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.2);
     }
 
     .input-label {
-        font-size: var(--font-size-xxsmall);
+        font-size: 0.65rem;
         text-transform: uppercase;
-        color: rgba(229, 229, 229, 0.5);
-        margin-bottom: 4px;
+        color: var(--color-accent);
+        margin-bottom: 6px;
+        font-weight: 800;
+        letter-spacing: 1px;
+        display: block;
+    }
+
+    .stay-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background: rgba(249, 115, 22, 0.1);
+        color: var(--color-accent);
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.7rem;
         font-weight: bold;
-        letter-spacing: 0.5px;
+        border: 1px solid rgba(249, 115, 22, 0.2);
+        margin-top: 10px;
+    }
+
+    /* Fix for the black-on-black clock icon in dark mode */
+    input[type="time"]::-webkit-calendar-picker-indicator {
+        filter: invert(1);
+        opacity: 0.6;
+        cursor: pointer;
+    }
+
+    input[type="time"]::-webkit-calendar-picker-indicator:hover {
+        opacity: 1;
+    }
+
+    .btn-delete {
+        background: transparent;
+        color: #ef4444;
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        width: 100%;
+        padding: 8px;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        margin-top: 5px;
+    }
+
+    .btn-delete:hover {
+        background: rgba(239, 68, 68, 0.1);
+        border-color: #ef4444;
     }
 `;
 
-const MarkerPopup = ({ point, stops, setStops, editMode, deleteWaypointByID }: { point: any, stops: any[], setStops: any, editMode: boolean, deleteWaypointByID: any }) =>{
+const MarkerPopup = ({ 
+    point, 
+    stops, 
+    setStops, 
+    editMode, 
+    deleteWaypointByID,
+    arrivalTime,
+    departureTime 
+}: { 
+    point: any, 
+    stops: any[], 
+    setStops: any, 
+    editMode: boolean, 
+    deleteWaypointByID: any,
+    arrivalTime?: Date,
+    departureTime?: Date
+}) =>{
 
     const [coordsText, setCoordsText] = useState(`${point.latitude}, ${point.longitude}`);
+    const stopType = getStopType(point.type);
 
     const handleCoordsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const val = e.target.value;
-        setCoordsText(val); // Update UI text instantly
+        setCoordsText(val);
 
-        // Only parse and update map data if it looks like a valid pair
         const parts = val.split(',');
         if (parts.length >= 2) {
             const lat = parseFloat(parts[0].trim());
@@ -113,58 +171,127 @@ const MarkerPopup = ({ point, stops, setStops, editMode, deleteWaypointByID }: {
         }
     }
 
-    // Keep the input text strictly in sync if the marker is dragged
+    const formatTime24 = (date?: Date) => {
+        if (!date) return "--:--";
+        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+    };
+
     useEffect(() => {
         setCoordsText(`${point.latitude}, ${point.longitude}`);
     }, [point.latitude, point.longitude]);
 
-
-
     return(
         <div className="marker-popup-wrapper">
             <style>{MARKER_POPUP_STYLE}</style>
-            {editMode ? (
-                <div className="marker-popup-edit">
-                    <span className="input-label">Location Name</span>
-                    <input 
-                        className="input-dark" 
-                        type="text" 
-                        value={point.name || ''} 
-                        placeholder="e.g. Grand Canyon"
-                        onFocus={(e) => e.target.select()}
-                        onChange={(e) => setStops(stops.map((s: any) => s.id === point.id ? { ...s, name: e.target.value } : s))} 
-                    />
+            
+            <div className="popup-header">
+                <h4 className="popup-title">
+                    {stopType.icon} {point.name || (editMode ? 'Edit Stop' : 'Waypoint')}
+                </h4>
+                <div className="popup-subtitle">
+                    {Number(point.latitude).toFixed(5)}, {Number(point.longitude).toFixed(5)}
+                </div>
+            </div>
 
-                    <span className="input-label">Coordinates (Lat, Long)</span>
-                    <input 
-                        className="input-dark" 
-                        type="text" 
-                        value={coordsText} 
-                        placeholder="e.g. 38.8951, -77.0369"
-                        onFocus={(e) => e.target.select()}
-                        onChange={handleCoordsChange}
-                    />
-                    <span className="input-label" style={{marginTop: '4px'}}>Notes</span>
-                    <textarea 
-                        className="input-dark" 
-                        style={{resize: 'none', height: '60px', marginBottom: 0}}
-                        value={point.note    || ''} 
-                        placeholder="Add details about this stop..."
-                        onFocus={(e) => e.target.select()}
-                        onChange={(e) => setStops(stops.map((s: any) => s.id === point.id ? { ...s, note: e.target.value } : s))} 
-                    />
-                    <button className="std-button" style={{marginTop: '4px'}} onClick={async () => await deleteWaypointByID(point.id)}>Delete</button>
-                </div>
-            ) : (
-                <div className="marker-popup-view">
-                    <h4 className="popup-title">{point.name || 'Waypoint'}</h4>
-                    <p className="popup-notes">{Number(point.latitude).toFixed(5)}, {Number(point.longitude).toFixed(5)}</p>
-                    <p className="popup-notes">{point.note}</p>
-                </div>
-            )}
+            <div className="popup-body">
+                {editMode ? (
+                    <div className="marker-popup-edit">
+                        <div className="input-group">
+                            <span className="input-label">Stop Name</span>
+                            <input 
+                                className="input-dark" 
+                                type="text" 
+                                value={point.name || ''} 
+                                placeholder="e.g. Scenic Overlook"
+                                onFocus={(e) => e.target.select()}
+                                onChange={(e) => setStops(stops.map((s: any) => s.id === point.id ? { ...s, name: e.target.value } : s))} 
+                            />
+                        </div>
+
+                        <div style={{display: 'flex', gap: '10px', marginBottom: '15px'}}>
+                            <div style={{flex: 1.5}}>
+                                <span className="input-label">Type</span>
+                                <select 
+                                    className="input-dark" 
+                                    value={point.type || 'waypoint'}
+                                    onChange={(e) => setStops(stops.map((s: any) => s.id === point.id ? { ...s, type: e.target.value } : s))}
+                                >
+                                    {STOP_TYPES.map(type => (
+                                        <option key={type.id} value={type.id}>{type.icon} {type.label}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            
+                            {(point.type === 'start' || point.type === 'hotel') ? (
+                                <div style={{flex: 1}}>
+                                    <span className="input-label">Departs</span>
+                                    <input 
+                                        className="input-dark" 
+                                        type="time" 
+                                        value={point.start_time || '09:00'}
+                                        onChange={(e) => setStops(stops.map((s: any) => s.id === point.id ? { ...s, start_time: e.target.value } : s))} 
+                                    />
+                                </div>
+                            ) : (
+                                <div style={{flex: 1}}>
+                                    <span className="input-label">Stay (min)</span>
+                                    <input 
+                                        className="input-dark" 
+                                        type="number" 
+                                        min="0"
+                                        value={point.stay_duration ?? ''}
+                                        onChange={(e) => setStops(stops.map((s: any) => s.id === point.id ? { ...s, stay_duration: e.target.value === '' ? undefined : parseInt(e.target.value) } : s))} 
+                                    />
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="input-group">
+                            <span className="input-label">Notes</span>
+                            <textarea 
+                                className="input-dark" 
+                                style={{resize: 'none', height: '60px'}}
+                                value={point.note || ''} 
+                                placeholder="Add details..."
+                                onFocus={(e) => e.target.select()}
+                                onChange={(e) => setStops(stops.map((s: any) => s.id === point.id ? { ...s, note: e.target.value } : s))} 
+                            />
+                        </div>
+
+                        <button className="btn-delete" onClick={async () => await deleteWaypointByID(point.id)}>
+                            Delete Waypoint
+                        </button>
+                    </div>
+                ) : (
+                    <div className="marker-popup-view">
+                        <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: '12px'}}>
+                            <div>
+                                <span className="input-label">Arrival</span>
+                                <div style={{fontSize: '1rem', fontWeight: 'bold', color: '#fff'}}>{formatTime24(arrivalTime)}</div>
+                            </div>
+                            <div style={{textAlign: 'right'}}>
+                                <span className="input-label">Departure</span>
+                                <div style={{fontSize: '1rem', fontWeight: 'bold', color: 'var(--color-accent)'}}>{formatTime24(departureTime)}</div>
+                            </div>
+                        </div>
+
+                        <div style={{fontSize: '0.85rem', color: 'rgba(255,255,255,0.7)', lineHeight: '1.5', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '10px'}}>
+                            {point.note || 'No notes for this stop.'}
+                        </div>
+                        
+                        {point.stay_duration > 0 && (
+                            <div className="stay-badge">
+                                ⏱️ {point.stay_duration} Minute Stop
+                            </div>
+                        )}
+                    </div>
+                )}
+            </div>
         </div>
     );
 }
+
+
 
 export default MarkerPopup;
 

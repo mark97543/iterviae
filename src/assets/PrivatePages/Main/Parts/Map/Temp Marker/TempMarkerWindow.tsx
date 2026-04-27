@@ -92,6 +92,7 @@ const TempMarkerWindow = () =>{
             latitude: searchStop.lat,
             longitude: searchStop.long,
             type: "waypoint",
+            stay_duration: 0,
             order: stops.length + 1
         }
         
