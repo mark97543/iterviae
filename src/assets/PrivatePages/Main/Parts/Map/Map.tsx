@@ -96,6 +96,12 @@ const MapComponent = () => {
     const {stops, route, setStops, editMode, setRoute, focusedID, setSearchStop, setShowSearchMenu} = useStops();
     const { deleteWaypointByID } = useDirectus();
 
+    // Use a ref for editMode so the map listeners (which are set once) can always see the current value
+    const editModeRef = useRef(editMode);
+    useEffect(() => {
+        editModeRef.current = editMode;
+    }, [editMode]);
+
 
     // SIDE EFFECT: Load External Map Assets
     // We dynamically inject the MapLibre CSS and JS to keep the bundle clean.
@@ -128,6 +134,9 @@ const MapComponent = () => {
 
             //Right Clck Add Point to route
             map.current.on('contextmenu', (e:any)=>{
+                // Only allow adding points if we are in Edit Mode
+                if (!editModeRef.current) return;
+
                 // This prevents default browser menu
                 e.preventDefault();
 

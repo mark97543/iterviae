@@ -20,7 +20,7 @@ const TempMarker = ({map}: {map: any}) =>{
     useEffect(()=>{
         
         //Exit if map is not ready or coordinates are missing
-        if(!map.current || !searchStop || !searchStop.long || !searchStop.lat){
+        if(!map.current || !searchStop || typeof searchStop.long !== 'number' || typeof searchStop.lat !== 'number'){
             console.log("Removing Temp Marker...");
             if (searchMarker.current) searchMarker.current.remove();
             if (popupRef.current) popupRef.current.remove();

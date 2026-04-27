@@ -134,8 +134,7 @@ export const DirectusProvider = ({ children }: { children: React.ReactNode }) =>
     }
 
     //Save Trip by ID
-    const saveTripByID = async (tripId: string) => {
-        //console.log(tripId)
+    const saveTripByID = async (tripId: string, silent: boolean = false, stopsToSave?: Stop[]) => {
         try {
             const token = localStorage.getItem('instrumentum_token');
             if (!token || !tripId) return null;
@@ -143,7 +142,10 @@ export const DirectusProvider = ({ children }: { children: React.ReactNode }) =>
             const createStops: any[] = [];
             const updateStops: any[] = [];
 
-            stops.forEach((stop: any) => {
+            // Use the provided stops or fall back to the context state
+            const finalStops = stopsToSave || stops;
+
+            finalStops.forEach((stop: any) => {
                 const isTemp = !stop.id || 
                                stop.id.toString().startsWith('temp_') || 
                                (!isNaN(Number(stop.id)) && stop.id.toString().length > 10);
@@ -168,6 +170,9 @@ export const DirectusProvider = ({ children }: { children: React.ReactNode }) =>
                     update: updateStops
                 }
             }, {
+                params: {
+                    fields: '*,stop.*' // Ensure we get the full updated trip back
+                },
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -176,8 +181,19 @@ export const DirectusProvider = ({ children }: { children: React.ReactNode }) =>
             if(result.status === 200){
                 console.log("Trip Updated Successfully");
                 const updatedTrip = result.data.data;
+                
+                // Update local trips list
                 setTrips(trips.map(t => t.id === updatedTrip.id ? updatedTrip : t));
-                setEditMode(false); // Exit edit mode
+                
+                // Sync local stops with the new IDs from the database
+                if (updatedTrip.stop) {
+                    setStops(updatedTrip.stop);
+                }
+
+                if (!silent) {
+                    setEditMode(false); // Only exit edit mode if NOT a silent save
+                }
+                
                 return updatedTrip;
             } else {
                 console.log("Error Saving Trip");

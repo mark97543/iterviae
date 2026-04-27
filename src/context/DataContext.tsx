@@ -60,7 +60,7 @@ export const StopsProvider = ({ children }: { children: React.ReactNode }) => {
     useEffect(() => {
         if (!user) {
             setStops([]);
-            setSearchStop({long:null, lat:null});
+            setSearchStop(null);
             setShowSearchMenu(false);
             setSearch("");
             setRoute(null);

@@ -1,4 +1,6 @@
+import { useState } from "react";
 import { useStops, type Stop } from "../../../../../../context/DataContext";
+import { useDirectus } from "../../../../../../context/DirectusContext";
 import { getTripDirections } from "../../../valhala";
 
 const TEMP_MARKER_WINDOW_STYLE=`
@@ -74,9 +76,15 @@ const TEMP_MARKER_WINDOW_STYLE=`
 
 const TempMarkerWindow = () =>{
 
-    const {stops,setStops,searchStop, setShowSearchMenu, setSearchStop, setSearch, route, setRoute} = useStops();
+    const {stops,setStops,searchStop, setShowSearchMenu, setSearchStop, setSearch, route, setRoute, editMode} = useStops();
+    const {currentTrip, saveTripByID} = useDirectus();
+
+    const [isAdding, setIsAdding] = useState(false);
 
     const addStop = async () =>{
+        if (isAdding) return;
+        setIsAdding(true);
+
         const newStop: Stop = {
             id: 'temp_' + Date.now().toString(),
             name: "New Point",
@@ -96,6 +104,11 @@ const TempMarkerWindow = () =>{
         setSearch("");
         setRoute(null);
         
+        // Push the new point to the database silently so we stay in edit mode
+        if (currentTrip && currentTrip.id) {
+            await saveTripByID(currentTrip.id, true, updatedStops);
+        }
+
         // Pass the calculated array so Valhalla sees the new stop instantly!
         const m = await getTripDirections(updatedStops);
         if (m) {
@@ -120,7 +133,16 @@ const TempMarkerWindow = () =>{
                 <button className="temp-marker-window-close-button" onClick={closeWindow}>X</button>
             </div>
             <h4>{searchStop.long.toFixed(5)}, {searchStop.lat.toFixed(5)}</h4>
-            <button className="std-button add-waypoint-button" onClick={addStop}>Add to Route</button>
+            {editMode && (
+                <button 
+                    className="std-button add-waypoint-button" 
+                    onClick={addStop}
+                    disabled={isAdding}
+                    style={{ opacity: isAdding ? 0.5 : 1, cursor: isAdding ? 'not-allowed' : 'pointer' }}
+                >
+                    {isAdding ? "Adding..." : "Add to Route"}
+                </button>
+            )}
         </div>
     )
 }
