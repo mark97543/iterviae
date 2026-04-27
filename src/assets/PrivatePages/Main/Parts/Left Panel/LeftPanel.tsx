@@ -4,6 +4,7 @@ import { useDirectus } from "../../../../../context/DirectusContext";
 import { useStops } from "../../../../../context/DataContext";
 import { useState } from "react";
 import Info from "./Parts/Info";
+import Itin from "./Parts/Itin";
 
 
 const LeftPanel_Style = `
@@ -123,10 +124,7 @@ const LeftPanel = () =>{
                 )}
 
                 {selectedTab === 2 && (
-                    <div style={{color: 'var(--color-primary)', textAlign: 'center', marginTop: '20px'}}>
-                        <h4 style={{marginBottom: '5px'}}>Detailed Itinerary</h4>
-                        <small style={{opacity: 0.6}}>(Coming Soon)</small>
-                    </div>
+                    <Itin/>
                 )}
             </div>
             {editMode ? <button className="std-button" style={{marginTop: 'auto'}} onClick={()=>saveTripByID(selectedTrip)}>Save Trip</button> : null}

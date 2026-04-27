@@ -13,6 +13,8 @@ export interface Trip {
     distance?: number;
     ride_time?: number;
     stop?: Stop[];
+    start_date?: string;
+    route_data?: string;
 }
 
 
@@ -25,7 +27,7 @@ export const DirectusProvider = ({ children }: { children: React.ReactNode }) =>
     const [directus, setDirectus] = useState(null);
     const [trips, setTrips] = useState<Trip[]>([]); /// All Trips for for this user 
     const [currentTrip, setCurrentTrip] = useState<Trip | null>(null); /// Selected Trip for this user
-    const {stops,setEditMode, setStops, route} = useStops();
+    const {stops,setEditMode, setStops, route, setRoute} = useStops();
 
     // Wipe session data when user logs out
     useEffect(() => {
@@ -122,6 +124,17 @@ export const DirectusProvider = ({ children }: { children: React.ReactNode }) =>
                 // console.log("Trip Data Loaded Successfully", result.data.data[0].stop);
                 const loadedTripData = result.data.data[0];
                 setCurrentTrip(loadedTripData);
+                setStops(loadedTripData.stop || []);
+                
+                // Safety check for route parsing (in case field is empty)
+                if (loadedTripData.route_data) {
+                    try {
+                        setRoute(JSON.parse(loadedTripData.route_data));
+                    } catch (e) {
+                        console.error("Error parsing route_data:", e);
+                    }
+                }
+
                 return loadedTripData;
             } else {
                 console.log("Error Loading Trip Data");
@@ -165,6 +178,8 @@ export const DirectusProvider = ({ children }: { children: React.ReactNode }) =>
                 summary: currentTrip?.summary,
                 distance: route?.distance,
                 ride_time: route?.duration,
+                start_date: currentTrip?.start_date, 
+                route_data: route ? JSON.stringify(route) : null,
                 stop: {
                     create: createStops,
                     update: updateStops

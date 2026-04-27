@@ -13,7 +13,7 @@ TODO: Directus schema for future downloads
 TODO: Need To set up a debounce autosave
 TODO: Cancel Save Button (Maybe not necessary since we are debouncing the save)
 TODO: Need to Add pagenation to the load trip modal
-TODO: Need Make a ITIN Page
+
 TODO: Search For the Open Trip MOdal
 TODO: When Shirking Screen the LoadTripMOdal table goes off the screen Need to set minim screen size (Mayne make this work in mobile and tablet view)
 TODO: When Shrinking the screen the user panel needs to be shrinkable to allow more room for the map (Maybe this could be fixed in mobile and tablet views)
@@ -22,4 +22,7 @@ TODO: Directus somthing to cleanup all stops with no coresponding trip
 
 
 Working on the following right now: 
-
+TODO: Need Make a ITIN Page
+    -Pull in Data form datacontext
+    -Add Start Date to Itinerary
+    -List Stops with times
