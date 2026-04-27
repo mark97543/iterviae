@@ -190,6 +190,14 @@ const MapComponent = () => {
                 // This prevents default browser menu
                 e.preventDefault();
 
+                // Close any open popups to prevent unexpected zooming to previous points
+                for (const [id, markerData] of markerRoots.current.entries()) {
+                    const popup = markerData.marker.getPopup();
+                    if (popup && popup.isOpen()) {
+                        popup.remove();
+                    }
+                }
+
                 //The coordinated of where clicked  
                 const lngLat = e.lngLat;
 

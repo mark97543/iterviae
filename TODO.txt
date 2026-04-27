@@ -1,13 +1,9 @@
-TODO: Right Click Menu
-TODO: Custom Waypoint Markers. 
 TODO: Need the search for bar to allow adresses and search for locations
 TODO: Add Setting to change colors for routes 
-TODO: Change Marker Color and Shape
 TODO: Need a mobile view
 TODO: Need a Tablet View
 TODO: Add save before exiting warning
 TODO: Route Slider for the route
-TOD0: Right click add point
 TODO: Points of interest
 TODO: Directus schema for future downloads
 TODO: Need To set up a debounce autosave
@@ -23,7 +19,4 @@ TODO: Make the long, lat copyable in both the stop popup and the Stops panel
 
 
 Working on the following right now: 
-TODO: Need Make a ITIN Page
-    -Pull in Data form datacontext
-    -Add Start Date to Itinerary
-    -List Stops with times
+Search bar beefing 
