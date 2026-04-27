@@ -158,33 +158,53 @@ export const DirectusProvider = ({ children }: { children: React.ReactNode }) =>
             // Use the provided stops or fall back to the context state
             const finalStops = stopsToSave || stops;
 
+            // Helper to pick only valid Stop fields for the database
+            const cleanStop = (s: any) => ({
+                name: s.name,
+                address: s.address,
+                latitude: s.latitude ? Number(s.latitude) : undefined,
+                longitude: s.longitude ? Number(s.longitude) : undefined,
+                note: s.note,
+                type: s.type,
+                stay_duration: s.stay_duration ? Number(s.stay_duration) : undefined,
+                start_time: s.start_time,
+                budget: s.budget ? Number(s.budget) : undefined,
+                sort: s.sort ? Number(s.sort) : undefined
+            });
+
             finalStops.forEach((stop: any) => {
                 const isTemp = !stop.id || 
                                stop.id.toString().startsWith('temp_') || 
                                (!isNaN(Number(stop.id)) && stop.id.toString().length > 10);
                 
                 if (isTemp) {
-                    const { id, trip, trip_id, ...rest } = stop;
-                    createStops.push(rest);
+                    createStops.push(cleanStop(stop));
                 } else {
-                    const { trip, trip_id, ...rest } = stop; // Clean up just in case
-                    updateStops.push(rest);
+                    updateStops.push({
+                        id: stop.id,
+                        ...cleanStop(stop)
+                    });
                 }
             });
 
-            const result = await axios.patch(`https://api.wade-usa.com/items/trip/${tripId}`, {
+            const payload: any = {
                 trip_name: currentTrip?.trip_name,
                 status: currentTrip?.status,
                 summary: currentTrip?.summary,
-                distance: route?.distance,
-                ride_time: route?.duration,
-                start_date: currentTrip?.start_date, 
+                distance: route?.distance ? Number(route.distance) : undefined,
+                ride_time: route?.duration ? Number(route.duration) : undefined,
+                start_date: currentTrip?.start_date || null,
                 route_data: route ? JSON.stringify(route) : null,
-                stop: {
-                    create: createStops,
-                    update: updateStops
-                }
-            }, {
+            };
+
+            // Only add stop updates if there are any
+            if (createStops.length > 0 || updateStops.length > 0) {
+                payload.stop = {};
+                if (createStops.length > 0) payload.stop.create = createStops;
+                if (updateStops.length > 0) payload.stop.update = updateStops;
+            }
+
+            const result = await axios.patch(`https://api.wade-usa.com/items/trip/${tripId}`, payload, {
                 params: {
                     fields: '*,stop.*' // Ensure we get the full updated trip back
                 },

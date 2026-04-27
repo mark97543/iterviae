@@ -115,7 +115,8 @@ const InfoStyle = `
     }
 
     .info-stats-grid {
-        display: flex;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
         gap: var(--gap-small);
     }
 
@@ -195,8 +196,10 @@ export const STATUS_DROPDOWN = [
 ];
 
 const Info = () =>{
-    const {editMode, route} = useStops();
+    const {editMode, route, stops} = useStops();
     const {currentTrip,setCurrentTrip} = useDirectus();
+
+    const totalBudget = stops.reduce((acc: number, stop: any) => acc + (Number(stop.budget) || 0), 0);
 
     return (
         <div className='info-wrapper'>
@@ -229,6 +232,19 @@ const Info = () =>{
                         </select>
                     </div>
 
+                    <div className="info-edit-group">
+                        <span className="info-label">Start Date</span>
+                        <input 
+                            className="std-input" 
+                            type="date" 
+                            value={currentTrip?.start_date ? new Date(currentTrip.start_date).toISOString().split('T')[0] : ''}
+                            onChange={(e) => {
+                                const val = e.target.value;
+                                setCurrentTrip({...currentTrip, start_date: val === '' ? null : val});
+                            }}
+                        />
+                    </div>
+
                     <div className="info-description-group">
                         <span className="info-label">Trip Summary</span>
                         <textarea 
@@ -244,22 +260,43 @@ const Info = () =>{
                         <div className='info-stats-grid'>
                             <div className="info-stat-card">
                                 <p className="info-stat-label">Distance</p>
-                                <p className="info-stat-value">{route?.distance ? route.distance.toFixed(0) : '0'}<span style={{fontSize: '0.9rem', marginLeft: '3px', color: 'rgba(229, 229, 229, 0.5)'}}>mi</span></p>
+                                <p className="info-stat-value" style={{fontSize: '1.2rem'}}>{route?.distance ? route.distance.toFixed(0) : '0'}<span style={{fontSize: '0.8rem', marginLeft: '2px', color: 'rgba(229, 229, 229, 0.5)'}}>mi</span></p>
+                            </div>
+                            <div className="info-stat-card">
+                                <p className="info-stat-label">Budget</p>
+                                <p className="info-stat-value" style={{fontSize: '1.2rem', color: '#4ade80'}}><span style={{fontSize: '0.8rem', marginRight: '1px', opacity: 0.7}}>$</span>{totalBudget.toLocaleString()}</p>
                             </div>
                             <div className="info-stat-card">
                                 <p className="info-stat-label">Ride Time</p>
-                                <p className="info-stat-value">{route?.duration ? (
+                                <p className="info-stat-value" style={{fontSize: '1.2rem'}}>{route?.duration ? (
                                     (() => {
                                         const d = Number(route.duration);
                                         const h = Math.floor(d / 3600);
                                         const m = Math.floor(d % 3600 / 60);
                                         return h > 0 ? (
-                                            <>{h}<span style={{fontSize: '0.9rem', margin: '0 3px', color: 'rgba(229, 229, 229, 0.5)'}}>h</span> {m}<span style={{fontSize: '0.9rem', marginLeft: '3px', color: 'rgba(229, 229, 229, 0.5)'}}>m</span></>
+                                            <>{h}<span style={{fontSize: '0.8rem', margin: '0 2px', color: 'rgba(229, 229, 229, 0.5)'}}>h</span> {m}<span style={{fontSize: '0.8rem', color: 'rgba(229, 229, 229, 0.5)'}}>m</span></>
                                         ) : (
-                                            <>{m}<span style={{fontSize: '0.9rem', marginLeft: '3px', color: 'rgba(229, 229, 229, 0.5)'}}>m</span></>
+                                            <>{m}<span style={{fontSize: '0.8rem', color: 'rgba(229, 229, 229, 0.5)'}}>m</span></>
                                         );
                                     })()
                                 ) : '0m'}</p>
+                            </div>
+                            <div className="info-stat-card">
+                                <p className="info-stat-label">Trip Dates</p>
+                                <p className="info-stat-value" style={{fontSize: '0.85rem', textAlign: 'center', lineHeight: '1.2'}}>
+                                    {(() => {
+                                        const start = currentTrip?.start_date ? new Date(currentTrip.start_date) : null;
+                                        const hotelCount = stops.filter((s: any) => s.type === 'hotel').length;
+                                        
+                                        if (!start) return <span style={{opacity: 0.5}}>TBD</span>;
+                                        
+                                        const end = new Date(start);
+                                        end.setDate(end.getDate() + hotelCount);
+                                        
+                                        const fmt = (d: Date) => d.toLocaleDateString([], { month: 'short', day: 'numeric' });
+                                        return <>{fmt(start)}<br/><span style={{fontSize: '0.7rem', opacity: 0.5}}>to</span><br/>{fmt(end)}</>;
+                                    })()}
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -294,22 +331,43 @@ const Info = () =>{
                         <div className='info-stats-grid'>
                             <div className="info-stat-card">
                                 <p className="info-stat-label">Distance</p>
-                                <p className="info-stat-value">{route?.distance ? route.distance.toFixed(0) : '0'}<span style={{fontSize: '0.9rem', marginLeft: '3px', color: 'rgba(229, 229, 229, 0.5)'}}>mi</span></p>
+                                <p className="info-stat-value" style={{fontSize: '1.2rem'}}>{route?.distance ? route.distance.toFixed(0) : '0'}<span style={{fontSize: '0.8rem', marginLeft: '2px', color: 'rgba(229, 229, 229, 0.5)'}}>mi</span></p>
+                            </div>
+                            <div className="info-stat-card">
+                                <p className="info-stat-label">Budget</p>
+                                <p className="info-stat-value" style={{fontSize: '1.2rem', color: '#4ade80'}}><span style={{fontSize: '0.8rem', marginRight: '1px', opacity: 0.7}}>$</span>{totalBudget.toLocaleString()}</p>
                             </div>
                             <div className="info-stat-card">
                                 <p className="info-stat-label">Ride Time</p>
-                                <p className="info-stat-value">{route?.duration ? (
+                                <p className="info-stat-value" style={{fontSize: '1.2rem'}}>{route?.duration ? (
                                     (() => {
                                         const d = Number(route.duration);
                                         const h = Math.floor(d / 3600);
                                         const m = Math.floor(d % 3600 / 60);
                                         return h > 0 ? (
-                                            <>{h}<span style={{fontSize: '0.9rem', margin: '0 3px', color: 'rgba(229, 229, 229, 0.5)'}}>h</span> {m}<span style={{fontSize: '0.9rem', marginLeft: '3px', color: 'rgba(229, 229, 229, 0.5)'}}>m</span></>
+                                            <>{h}<span style={{fontSize: '0.8rem', margin: '0 2px', color: 'rgba(229, 229, 229, 0.5)'}}>h</span> {m}<span style={{fontSize: '0.8rem', color: 'rgba(229, 229, 229, 0.5)'}}>m</span></>
                                         ) : (
-                                            <>{m}<span style={{fontSize: '0.9rem', marginLeft: '3px', color: 'rgba(229, 229, 229, 0.5)'}}>m</span></>
+                                            <>{m}<span style={{fontSize: '0.8rem', color: 'rgba(229, 229, 229, 0.5)'}}>m</span></>
                                         );
                                     })()
                                 ) : '0m'}</p>
+                            </div>
+                            <div className="info-stat-card">
+                                <p className="info-stat-label">Trip Dates</p>
+                                <p className="info-stat-value" style={{fontSize: '0.85rem', textAlign: 'center', lineHeight: '1.2'}}>
+                                    {(() => {
+                                        const start = currentTrip?.start_date ? new Date(currentTrip.start_date) : null;
+                                        const hotelCount = stops.filter((s: any) => s.type === 'hotel').length;
+                                        
+                                        if (!start) return <span style={{opacity: 0.5}}>TBD</span>;
+                                        
+                                        const end = new Date(start);
+                                        end.setDate(end.getDate() + hotelCount);
+                                        
+                                        const fmt = (d: Date) => d.toLocaleDateString([], { month: 'short', day: 'numeric' });
+                                        return <>{fmt(start)}<br/><span style={{fontSize: '0.7rem', opacity: 0.5}}>to</span><br/>{fmt(end)}</>;
+                                    })()}
+                                </p>
                             </div>
                         </div>
                     </div>
