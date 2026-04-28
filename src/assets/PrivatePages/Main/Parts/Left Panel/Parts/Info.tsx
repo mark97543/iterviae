@@ -237,7 +237,7 @@ const Info = () =>{
                         <input 
                             className="std-input" 
                             type="date" 
-                            value={currentTrip?.start_date ? new Date(currentTrip.start_date).toISOString().split('T')[0] : ''}
+                            value={currentTrip?.start_date ? currentTrip.start_date.split('T')[0] : ''}
                             onChange={(e) => {
                                 const val = e.target.value;
                                 setCurrentTrip({...currentTrip, start_date: val === '' ? null : val});
@@ -285,16 +285,23 @@ const Info = () =>{
                                 <p className="info-stat-label">Trip Dates</p>
                                 <p className="info-stat-value" style={{fontSize: '0.85rem', textAlign: 'center', lineHeight: '1.2'}}>
                                     {(() => {
-                                        const start = currentTrip?.start_date ? new Date(currentTrip.start_date) : null;
+                                        if (!currentTrip?.start_date) return <span style={{opacity: 0.5}}>TBD</span>;
+                                        
+                                        const fmtStr = (str: string) => {
+                                            const [y, m, d] = str.split('T')[0].split('-');
+                                            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                                            return `${months[parseInt(m)-1]} ${parseInt(d)}`;
+                                        };
+
+                                        const startStr = fmtStr(currentTrip.start_date);
+                                        const [y, m, d] = currentTrip.start_date.split('T')[0].split('-').map(Number);
+                                        const endDate = new Date(y, m - 1, d);
                                         const hotelCount = stops.filter((s: any) => s.type === 'hotel').length;
+                                        endDate.setDate(endDate.getDate() + hotelCount);
                                         
-                                        if (!start) return <span style={{opacity: 0.5}}>TBD</span>;
-                                        
-                                        const end = new Date(start);
-                                        end.setDate(end.getDate() + hotelCount);
-                                        
-                                        const fmt = (d: Date) => d.toLocaleDateString([], { month: 'short', day: 'numeric' });
-                                        return <>{fmt(start)}<br/><span style={{fontSize: '0.7rem', opacity: 0.5}}>to</span><br/>{fmt(end)}</>;
+                                        const endStr = fmtStr(endDate.toISOString());
+
+                                        return <>{startStr}<br/><span style={{fontSize: '0.7rem', opacity: 0.5}}>to</span><br/>{endStr}</>;
                                     })()}
                                 </p>
                             </div>
@@ -356,16 +363,26 @@ const Info = () =>{
                                 <p className="info-stat-label">Trip Dates</p>
                                 <p className="info-stat-value" style={{fontSize: '0.85rem', textAlign: 'center', lineHeight: '1.2'}}>
                                     {(() => {
-                                        const start = currentTrip?.start_date ? new Date(currentTrip.start_date) : null;
+                                        if (!currentTrip?.start_date) return <span style={{opacity: 0.5}}>TBD</span>;
+                                        
+                                        // Text-based format MM/DD
+                                        const fmtStr = (str: string) => {
+                                            const [y, m, d] = str.split('T')[0].split('-');
+                                            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                                            return `${months[parseInt(m)-1]} ${parseInt(d)}`;
+                                        };
+
+                                        const startStr = fmtStr(currentTrip.start_date);
+                                        
+                                        // For end date, we still use Date for math, but then convert to string
+                                        const [y, m, d] = currentTrip.start_date.split('T')[0].split('-').map(Number);
+                                        const endDate = new Date(y, m - 1, d);
                                         const hotelCount = stops.filter((s: any) => s.type === 'hotel').length;
+                                        endDate.setDate(endDate.getDate() + hotelCount);
                                         
-                                        if (!start) return <span style={{opacity: 0.5}}>TBD</span>;
-                                        
-                                        const end = new Date(start);
-                                        end.setDate(end.getDate() + hotelCount);
-                                        
-                                        const fmt = (d: Date) => d.toLocaleDateString([], { month: 'short', day: 'numeric' });
-                                        return <>{fmt(start)}<br/><span style={{fontSize: '0.7rem', opacity: 0.5}}>to</span><br/>{fmt(end)}</>;
+                                        const endStr = fmtStr(endDate.toISOString());
+
+                                        return <>{startStr}<br/><span style={{fontSize: '0.7rem', opacity: 0.5}}>to</span><br/>{endStr}</>;
                                     })()}
                                 </p>
                             </div>

@@ -274,9 +274,13 @@ const MapComponent = () => {
         // Time Tracking Logic for Popups
         let currentDayOffset = 0;
         const getBaseDateStr = (offset: number) => {
-            const d = new Date(currentTrip?.start_date || new Date());
+            const d = (() => {
+                if (!currentTrip?.start_date) return new Date();
+                const [y, m, dPart] = currentTrip.start_date.split('T')[0].split('-').map(Number);
+                return new Date(y, m - 1, dPart);
+            })();
             d.setDate(d.getDate() + offset);
-            return d.toISOString().split('T')[0];
+            return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
         };
 
         let runningTime = new Date(`${getBaseDateStr(0)}T09:00:00`);

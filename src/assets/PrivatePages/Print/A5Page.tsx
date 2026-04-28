@@ -358,15 +358,27 @@ export const A5Page = () => {
         return `${hours}hr ${minutes}min`;
     }
 
-    // Calculate Dates
-    const startDate = currentTrip?.start_date ? new Date(currentTrip.start_date) : null;
-    let endDate = null;
-    if (startDate && currentTrip?.stop) {
-        const hotelCount = currentTrip.stop.filter((s: any) => s.type === 'hotel').length;
-        endDate = new Date(startDate);
-        endDate.setDate(endDate.getDate() + hotelCount);
-    }
-    const formatDate = (d: Date | null) => d ? d.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: '2-digit' }) : 'TBD';
+    // Calculate Dates (Pure string-based to avoid timezone shifts)
+    const formatDateString = (str: string | undefined | null) => {
+        if (!str) return 'TBD';
+        const datePart = str.split('T')[0];
+        const [y, m, d] = datePart.split('-');
+        if (!y || !m || !d) return 'TBD';
+        return `${m}/${d}/${y.slice(-2)}`;
+    };
+
+    const tripStartDateDisplay = formatDateString(currentTrip?.start_date);
+    
+    // For the End Date, we still need to calculate the offset based on hotel stays
+    const tripEndDateDisplay = (() => {
+        if (!currentTrip?.start_date) return 'TBD';
+        const [y, m, d] = currentTrip.start_date.split('T')[0].split('-').map(Number);
+        const date = new Date(y, m - 1, d);
+        const hotelCount = currentTrip.stop?.filter((s: any) => s.type === 'hotel').length || 0;
+        date.setDate(date.getDate() + hotelCount);
+        return formatDateString(date.toISOString());
+    })();
+
     const formatClockTime = (d: Date | null) => d ? d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }) : 'TBD';
     
 
@@ -392,8 +404,8 @@ export const A5Page = () => {
                     <tr>
                         <td>{Number(currentTrip?.distance).toFixed(1)} mi</td>
                         <td>{formatTime(currentTrip?.ride_time)}</td>
-                        <td>{formatDate(startDate)}</td>
-                        <td>{formatDate(endDate)}</td>
+                        <td>{tripStartDateDisplay}</td>
+                        <td>{tripEndDateDisplay}</td>
                         <td>$ {totalBudget.toFixed(2)}</td>
                     </tr>
                 </table>
@@ -433,7 +445,7 @@ export const A5Page = () => {
                                         <>
                                             {stop.type !== 'start' ? ' | ' : ''}
                                             <b>DEPART:</b> {(stop.type === 'start' || stop.type === 'hotel') 
-                                                ? stop.start_time + ' on ' + formatDate(startDate)
+                                                ? stop.start_time + ' on ' + tripStartDateDisplay
                                                 : formatClockTime(routeTImesDeparture(routeTImesArrival(index, pageIndex), stop.stay_duration || 0))
                                             }
                                         </>

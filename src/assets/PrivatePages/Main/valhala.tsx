@@ -81,7 +81,7 @@ const getTripDirections = async (stops: Stop[]) => {
         // This prevents accidentally speeding up winding mountain roads or backroads in the East.
         const avgSpeed = (segmentDistance / (segmentDuration / 3600));
         
-        console.log(`[DEBUG] Segment ${i + 1}: Distance=${segmentDistance.toFixed(1)}mi, Time=${segmentDuration}s, Speed=${avgSpeed.toFixed(1)} mph`);
+        // console.log(`[DEBUG] Segment ${i + 1}: Distance=${segmentDistance.toFixed(1)}mi, Time=${segmentDuration}s, Speed=${avgSpeed.toFixed(1)} mph`);
 
         if (segmentDistance > 20 && avgSpeed < 35) {
             // Recalculate based on 65 mph (Conservative national highway average)

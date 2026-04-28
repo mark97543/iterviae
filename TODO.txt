@@ -1,6 +1,6 @@
 TODO: Need the search for bar to allow adresses and search for locations
 TODO: Add Setting to change colors for routes 
-TODO: Need a mobile view
+
 TODO: Need a Tablet View
 TODO: Add save before exiting warning
 TODO: Route Slider for the route
@@ -16,9 +16,11 @@ TODO: When Shrinking the screen the user panel needs to be shrinkable to allow m
 TODO: Directus somthing to cleanup all stops with no coresponding trip
 TODO: limit Text size for trip summary 
 TODO: Draggable stops
-TODO: When Creating new trip it does not go and load that trip as blank
+TODO: When Creating new trip it needs to load that trip
+TODO: Need to incorperate loading screen when new trip is loaded
 
 
 
 Working on the following right now: 
 
+TODO: Need a mobile view

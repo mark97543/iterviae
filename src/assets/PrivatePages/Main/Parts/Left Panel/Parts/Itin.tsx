@@ -234,9 +234,13 @@ const Itin = () => {
             ) : (
                 <div className="timeline">
                     {days.map((day, dayIndex) => {
-                        const baseDate = new Date(currentTrip?.start_date || new Date());
+                        const baseDate = (() => {
+                            if (!currentTrip?.start_date) return new Date();
+                            const [y, m, d] = currentTrip.start_date.split('T')[0].split('-').map(Number);
+                            return new Date(y, m - 1, d);
+                        })();
                         baseDate.setDate(baseDate.getDate() + dayIndex);
-                        const baseDateStr = baseDate.toISOString().split('T')[0];
+                        const baseDateStr = baseDate.getFullYear() + '-' + String(baseDate.getMonth() + 1).padStart(2, '0') + '-' + String(baseDate.getDate()).padStart(2, '0');
 
                         // LOGIC: If this is Day 2+, and Day 1 ended with a Hotel, use that Hotel's start_time.
                         // Otherwise use the first stop of THIS day's start_time.
@@ -374,12 +378,9 @@ const ViewMode = () => {
     // Format date nicely
     const formatDate = (dateStr: string) => {
         if (!dateStr) return "Select Start Date";
-        return new Date(dateStr).toLocaleDateString(undefined, { 
-            weekday: 'long', 
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric' 
-        });
+        const [y, m, d] = dateStr.split('T')[0].split('-').map(Number);
+        const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+        return `${months[m-1]} ${d}, ${y}`;
     }
 
     return (
