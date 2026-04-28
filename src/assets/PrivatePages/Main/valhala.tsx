@@ -25,7 +25,17 @@ const getTripDirections = async (stops: Stop[]) => {
         const chunk = [locations[i], locations[i + 1]];
         const query = {
             locations: chunk,
-            costing: "motorcycle",
+            costing: "auto",
+            costing_options: {
+                auto: {
+                    top_speed: 130,
+                    use_primary: 1.0,
+                    use_highways: 1.0,
+                    use_roads: 1.0,
+                    use_secondary: 1.0,
+                    ignore_closures: true
+                }
+            },
             units: "miles"
         };
 
@@ -38,7 +48,8 @@ const getTripDirections = async (stops: Stop[]) => {
                     console.error(`Valhalla routing failed for segment ${i + 1} with status: ${res.status}`);
                     return null;
                 }
-                return await res.json();
+                const data = await res.json();
+                return data;
             }).catch(error => {
                 console.error(`Network error on segment ${i + 1}:`, error);
                 return null;
@@ -55,14 +66,41 @@ const getTripDirections = async (stops: Stop[]) => {
     let totalDuration = 0;
     let allLegs = [];
 
-    for (const data of results) {
+    for (let i = 0; i < results.length; i++) {
+        const data = results[i];
         if (!data || !data.trip || !data.trip.legs) {
-            console.error("Valhalla returned invalid data structure for a segment.");
-            return null; // Fail gracefully if any segment fails
+            console.error(`Valhalla returned invalid data structure for segment ${i + 1}`);
+            return null; 
         }
+
+        let segmentDistance = data.trip.summary.length; // miles
+        let segmentDuration = data.trip.summary.time;   // seconds
+
+        // NEVADA SPEED HACK (Refined for Universal use): 
+        // We only trigger if the segment is very long (> 20 miles) and the speed is "Impossible" slow (< 35 mph).
+        // This prevents accidentally speeding up winding mountain roads or backroads in the East.
+        const avgSpeed = (segmentDistance / (segmentDuration / 3600));
+        
+        console.log(`[DEBUG] Segment ${i + 1}: Distance=${segmentDistance.toFixed(1)}mi, Time=${segmentDuration}s, Speed=${avgSpeed.toFixed(1)} mph`);
+
+        if (segmentDistance > 20 && avgSpeed < 35) {
+            // Recalculate based on 65 mph (Conservative national highway average)
+            const correctedDuration = Math.round((segmentDistance / 65) * 3600);
+            
+            console.warn(`[Speed Hack] Segment ${i + 1}: Corrected unrealistic speed (${avgSpeed.toFixed(1)} mph) to 65 mph. Time: ${segmentDuration}s -> ${correctedDuration}s`);
+            
+            segmentDuration = correctedDuration;
+            
+            // Patch BOTH the summary and the individual leg so the A5 Print Page sees it!
+            data.trip.summary.time = correctedDuration;
+            if (data.trip.legs && data.trip.legs[0]) {
+                data.trip.legs[0].summary.time = correctedDuration;
+            }
+        }
+
         allShapes.push(...data.trip.legs.map((leg: any) => leg.shape));
-        totalDistance += data.trip.summary.length;
-        totalDuration += data.trip.summary.time;
+        totalDistance += segmentDistance;
+        totalDuration += segmentDuration;
         allLegs.push(...data.trip.legs);
     }
 
