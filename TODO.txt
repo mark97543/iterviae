@@ -16,6 +16,7 @@ TODO: Draggable stops to order.
 TODO: When Creating new trip it needs to load that trip
 TODO: Need to incorperate loading screen when new trip is loaded
 TODO: Make Map Maximize screen go away on default one
+TODO: On Load Trip need to fly to route or stop if points exist.
 
 
 
@@ -26,3 +27,5 @@ TODO: When Shrinking the screen the user panel needs to be shrinkable to allow m
 TODO: Need a Tablet View
 - Made a function to sense screen sizes. 
 - Loaded map into mobile view
+- Load Scxreen for mobile view si complete 
+

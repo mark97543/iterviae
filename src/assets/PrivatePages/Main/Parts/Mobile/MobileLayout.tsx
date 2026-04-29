@@ -1,5 +1,6 @@
 import MapComponent from "../Map/Map";
 import MobileTopPanel from "./Parts/MobileTopPanel";
+import MobileControls from "./Parts/MobileControls";
 
 const MOBILE_UI_STYLE = `
     .mobile-layout-container {
@@ -33,7 +34,7 @@ const MobileLayout = () => {
                 <MapComponent />
             </div>
             <div className="bottom-panel">
-                <h1>Testing</h1>
+                <MobileControls />
             </div>
 
         </div>
