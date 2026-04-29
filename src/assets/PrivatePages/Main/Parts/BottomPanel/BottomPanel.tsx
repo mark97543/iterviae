@@ -7,6 +7,7 @@ import EditTripModal from './Parts/EditTripModal';
 import LoadTripModal from './Parts/LoadTripModal';
 import { useStops } from '../../../../../context/DataContext';
 import { useNavigate } from 'react-router-dom';
+import PrintModal from './Parts/PrintModal';
 
 const BOTTOM_PANEL_STYLE=`
     .bottom-panel-wrapper{
@@ -44,6 +45,8 @@ const BottomPanel = () => {
     const {editMode, setEditMode} = useStops()
     const {currentTrip} = useDirectus()
     const navigate = useNavigate();
+    const [showPrintModal, setShowPrintModal] = useState(false);
+
 
     return(
         <div className="bottom-panel-wrapper">
@@ -52,6 +55,8 @@ const BottomPanel = () => {
             {showNewTripModal && <NewTripModal setModal={setShowNewTripModal}/>}
             {showEditTripModal && <EditTripModal setModal={setShowEditTripModal}/>}
             {showLoadTripModal && <LoadTripModal setModal={setShowLoadTripModal}/>}
+            {showPrintModal && <PrintModal setModal={setShowPrintModal}/>}
+
 
 
             <Tippy content='Edit Trip'>
@@ -73,7 +78,7 @@ const BottomPanel = () => {
             </Tippy>
 
             <Tippy content="Print A4">
-                <button className="std-button new-trip-btn" onClick={()=>window.open(`/a4print?tripId=${currentTrip?.id}`, '_blank')}>
+                <button className="std-button new-trip-btn" onClick={() => setShowPrintModal(!showPrintModal)}>
                     <img src="./print.png"/>
                 </button>
             </Tippy>

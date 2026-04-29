@@ -11,6 +11,7 @@ import Pending from './assets/PublicPages/Pending/Pending'
 import MissingPage from './assets/PublicPages/404Page/MissingPage'
 import { DirectusProvider } from './context/DirectusContext'
 import A4Page from './assets/PrivatePages/Print/A5Page'
+import MemoPage from './assets/PrivatePages/Print/MemoPage'
 
 function App() {
 
@@ -25,6 +26,7 @@ function App() {
             <Route path="/pending" element={<Pending />} />
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/a4print" element={<ProtectedRoute><A4Page /></ProtectedRoute>} />
+            <Route path="/memoprint" element={<ProtectedRoute><MemoPage /></ProtectedRoute>} />
             <Route path="*" element={<MissingPage />} />
           </Routes>
         </DirectusProvider>

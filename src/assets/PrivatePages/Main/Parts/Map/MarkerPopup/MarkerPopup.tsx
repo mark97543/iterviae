@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo } from "react";
 import { STOP_TYPES, getStopType } from "../../../../../../constants/StopTypes";
 import { useDirectus } from "../../../../../../context/DirectusContext";
 
@@ -137,7 +137,7 @@ const MARKER_POPUP_STYLE=`
     }
 `;
 
-const MarkerPopup = ({ 
+const MarkerPopup = memo(({ 
     point, 
     stops, 
     setStops, 
@@ -159,6 +159,8 @@ const MarkerPopup = ({
     departureTime?: Date
 }) =>{
 
+    const [nameText, setNameText] = useState(point.name || '');
+    const [noteText, setNoteText] = useState(point.note || '');
     const [budgetText, setBudgetText] = useState(point.budget?.toString() || '');
     const [coordsText, setCoordsText] = useState(`${point.latitude}, ${point.longitude}`);
     const stopType = getStopType(point.type);
@@ -182,6 +184,15 @@ const MarkerPopup = ({
         return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
     };
 
+    // Sync local state from props when they change externally (e.g. from sidebar or dragging)
+    useEffect(() => {
+        if (point.name !== nameText) setNameText(point.name || '');
+    }, [point.name]);
+
+    useEffect(() => {
+        if (point.note !== noteText) setNoteText(point.note || '');
+    }, [point.note]);
+
     useEffect(() => {
         setBudgetText(point.budget?.toString() || '');
     }, [point.budget]);
@@ -189,6 +200,56 @@ const MarkerPopup = ({
     useEffect(() => {
         setCoordsText(`${point.latitude}, ${point.longitude}`);
     }, [point.latitude, point.longitude]);
+
+    // DEBOUNCED SYNC: Push local changes up to the global stops state
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            if (nameText !== (point.name || '')) {
+                setStops((prev: any[]) => prev.map((s: any) => s.id === point.id ? { ...s, name: nameText } : s));
+            }
+        }, 800);
+        return () => clearTimeout(timer);
+    }, [nameText, point.id]);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            if (noteText !== (point.note || '')) {
+                setStops((prev: any[]) => prev.map((s: any) => s.id === point.id ? { ...s, note: noteText } : s));
+            }
+        }, 800);
+        return () => clearTimeout(timer);
+    }, [noteText, point.id]);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            const val = budgetText;
+            if (val === '' || /^\d*\.?\d*$/.test(val)) {
+                if (val === '') {
+                    if (point.budget !== undefined) setStops((prev: any[]) => prev.map((s: any) => s.id === point.id ? { ...s, budget: undefined } : s));
+                } else if (!val.endsWith('.')) {
+                    const parsed = parseFloat(val);
+                    if (parsed !== point.budget) setStops((prev: any[]) => prev.map((s: any) => s.id === point.id ? { ...s, budget: parsed } : s));
+                }
+            }
+        }, 800);
+        return () => clearTimeout(timer);
+    }, [budgetText, point.id]);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            const parts = coordsText.split(',');
+            if (parts.length >= 2) {
+                const lat = parseFloat(parts[0].trim());
+                const lng = parseFloat(parts[1].trim());
+                if (!isNaN(lat) && !isNaN(lng)) {
+                    if (lat !== point.latitude || lng !== point.longitude) {
+                        setStops((prev: any[]) => prev.map((s: any) => s.id === point.id ? { ...s, latitude: lat, longitude: lng } : s));
+                    }
+                }
+            }
+        }, 800);
+        return () => clearTimeout(timer);
+    }, [coordsText, point.id]);
 
     return(
         <div className="marker-popup-wrapper">
@@ -211,10 +272,9 @@ const MarkerPopup = ({
                             <input 
                                 className="input-dark" 
                                 type="text" 
-                                value={point.name || ''} 
+                                value={nameText} 
                                 placeholder="e.g. Scenic Overlook"
-                                onFocus={(e) => e.target.select()}
-                                onChange={(e) => setStops(stops.map((s: any) => s.id === point.id ? { ...s, name: e.target.value } : s))} 
+                                onChange={(e) => setNameText(e.target.value)} 
                             />
                         </div>
 
@@ -225,8 +285,7 @@ const MarkerPopup = ({
                                 type="text" 
                                 value={coordsText} 
                                 placeholder="40.7128, -74.0060"
-                                onFocus={(e) => e.target.select()}
-                                onChange={handleCoordsChange} 
+                                onChange={(e) => setCoordsText(e.target.value)} 
                             />
                         </div>
 
@@ -273,10 +332,9 @@ const MarkerPopup = ({
                             <textarea 
                                 className="input-dark" 
                                 style={{resize: 'none', height: '60px'}}
-                                value={point.note || ''} 
+                                value={noteText} 
                                 placeholder="Add details..."
-                                onFocus={(e) => e.target.select()}
-                                onChange={(e) => setStops(stops.map((s: any) => s.id === point.id ? { ...s, note: e.target.value } : s))} 
+                                onChange={(e) => setNoteText(e.target.value)} 
                             />
                         </div>
 
@@ -287,18 +345,7 @@ const MarkerPopup = ({
                                 type="text" 
                                 value={budgetText}
                                 placeholder="0.00"
-                                onFocus={(e) => e.target.select()}
-                                onChange={(e) => {
-                                    const val = e.target.value;
-                                    if (val === '' || /^\d*\.?\d*$/.test(val)) {
-                                        setBudgetText(val);
-                                        if (val === '') {
-                                            setStops(stops.map((s: any) => s.id === point.id ? { ...s, budget: undefined } : s));
-                                        } else if (!val.endsWith('.')) {
-                                            setStops(stops.map((s: any) => s.id === point.id ? { ...s, budget: parseFloat(val) } : s));
-                                        }
-                                    }
-                                }} 
+                                onChange={(e) => setBudgetText(e.target.value)} 
                             />
                         </div>
 
@@ -342,9 +389,19 @@ const MarkerPopup = ({
             </div>
         </div>
     );
-}
-
-
+}, (prev, next) => {
+    // Custom Comparison: Only re-render if visual/timing data changed
+    return prev.point.latitude === next.point.latitude &&
+           prev.point.longitude === next.point.longitude &&
+           prev.point.type === next.point.type &&
+           prev.point.name === next.point.name &&
+           prev.point.stay_duration === next.point.stay_duration &&
+           prev.point.start_time === next.point.start_time &&
+           prev.point.budget === next.point.budget &&
+           prev.point.note === next.point.note &&
+           prev.editMode === next.editMode &&
+           prev.arrivalTime?.getTime() === next.arrivalTime?.getTime() &&
+           prev.departureTime?.getTime() === next.departureTime?.getTime();
+});
 
 export default MarkerPopup;
-

@@ -398,7 +398,7 @@ const MapComponent = () => {
                 }
             }
         });
-    }, [stops, editMode, route, currentTrip, deleteWaypointByID, setStops]);
+    }, [stops, editMode, route, currentTrip?.start_date, deleteWaypointByID, setStops]);
 
     // SIDE EFFECT: Listen for focus requests from the sidebar
     useEffect(() => {

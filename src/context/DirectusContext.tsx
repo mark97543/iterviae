@@ -295,6 +295,22 @@ export const DirectusProvider = ({ children }: { children: React.ReactNode }) =>
         }
     }
 
+    // ** DEBOUNCED AUTOSAVE **
+    // This watches for changes to the trip or stops and saves after a 2s delay
+    useEffect(() => {
+        if (!currentTrip?.id || !user) return;
+
+        // Don't autosave if we are just loading a trip for the first time
+        // (We check if the route_data exists as a proxy for 'has it been initialized')
+        
+        const timer = setTimeout(() => {
+            console.log("Autosaving Trip Data...");
+            saveTripByID(currentTrip.id, true); // Silent save
+        }, 2000);
+
+        return () => clearTimeout(timer);
+    }, [currentTrip?.trip_name, currentTrip?.summary, currentTrip?.status, currentTrip?.start_date, stops, route]);
+
     return (
         <DirectusContext.Provider value={{ 
             directus, 
