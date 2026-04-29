@@ -1,8 +1,8 @@
 import { createPortal } from 'react-dom';
 import { useState, useEffect } from 'react';
-import { useDirectus } from '../../../../../../context/DirectusContext';
-import { useStops } from '../../../../../../context/DataContext';
-import { getTripDirections } from '../../../valhala';
+import { useDirectus } from '../../../../../../../context/DirectusContext';
+import { useStops } from '../../../../../../../context/DataContext';
+// import { getTripDirections } from '../../../../valhala';
 import { STATUS_DROPDOWN } from '../../Left Panel/Parts/Info';
 
 

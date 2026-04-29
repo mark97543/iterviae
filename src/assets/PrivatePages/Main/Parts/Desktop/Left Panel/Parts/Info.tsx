@@ -1,5 +1,5 @@
-import {useStops} from "../../../../../../context/DataContext";
-import {useDirectus} from "../../../../../../context/DirectusContext";
+import {useStops} from "../../../../../../../context/DataContext";
+import {useDirectus} from "../../../../../../../context/DirectusContext";
 
 const InfoStyle = `
     .info-wrapper {

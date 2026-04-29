@@ -77,6 +77,12 @@ export const StopsProvider = ({ children }: { children: React.ReactNode }) => {
         }
     }, [user]);
 
+    //Effect to delete route when there is no stops
+    useEffect(() => {
+        if (stops.length === 0) {
+            setRoute(null);
+        }
+    }, [stops]);
     
 
     return (

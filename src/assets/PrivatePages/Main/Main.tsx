@@ -23,6 +23,7 @@ const Dashboard = () => {
                     <p>Loading Trip Data...</p>
                 </div>
             )}
+
             {isDesktop ? (<DesktopWrapper />)
                 :(isTablet ? (<>Tablet Mode</>) 
                 :(isMobile ?(<>Mobile Mode</>)

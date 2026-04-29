@@ -1,4 +1,4 @@
-import {useDirectus} from '../../../../../../context/DirectusContext';
+import {useDirectus} from '../../../../../../../context/DirectusContext';
 
 const PRINT_TRIP_MODAL_STYLE = `
     .print-trip-modal-overlay-transparent {

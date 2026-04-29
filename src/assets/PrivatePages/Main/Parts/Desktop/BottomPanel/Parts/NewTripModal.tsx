@@ -1,6 +1,6 @@
 import React from 'react'
 import { useState } from 'react';
-import { useDirectus } from '../../../../../../context/DirectusContext';
+import { useDirectus } from '../../../../../../../context/DirectusContext';
 
 const NEW_TRIP_MODAL_STYLE = `
     .new-trip-modal-overlay-transparent {

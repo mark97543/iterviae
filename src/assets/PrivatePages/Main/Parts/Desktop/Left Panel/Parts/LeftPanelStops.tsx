@@ -1,4 +1,4 @@
-import { useStops } from "../../../../../../context/DataContext";
+import { useStops } from "../../../../../../../context/DataContext";
 
 const LEFTPANELSTOPSSTYLE = `
     .left-panel-stops-wrapper{
@@ -76,7 +76,7 @@ const LEFTPANELSTOPSSTYLE = `
 `;
 
 const LeftPanelStops =()=>{
-    const {stops, route, focusedID, setFocusedID} = useStops();
+    const {stops, route, setFocusedID} = useStops();
 
     //Seconds to XXhr XXmin format
     function secondsToHms(d: number) {
