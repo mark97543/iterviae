@@ -3,6 +3,8 @@ import { useResponsive } from '../../../hooks/useResponsive.ts';
 import { useDirectus } from '../../../context/DirectusContext';
 import DesktopWrapper from './Parts/Desktop/DesktopWrapper';
 import './Main.css';
+import MobileLayout from './Parts/Mobile/MobileLayout';
+
 
 
 
@@ -26,7 +28,7 @@ const Dashboard = () => {
 
             {isDesktop ? (<DesktopWrapper />)
                 :(isTablet ? (<>Tablet Mode</>) 
-                :(isMobile ?(<>Mobile Mode</>)
+                :(isMobile ?(<><MobileLayout /></>)
                 :(<>Error</>
             )))}
 

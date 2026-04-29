@@ -15,6 +15,7 @@ TODO: limit Text size for trip summary
 TODO: Draggable stops to order. 
 TODO: When Creating new trip it needs to load that trip
 TODO: Need to incorperate loading screen when new trip is loaded
+TODO: Make Map Maximize screen go away on default one
 
 
 
@@ -24,3 +25,4 @@ TODO: When Shirking Screen the LoadTripMOdal table goes off the screen Need to s
 TODO: When Shrinking the screen the user panel needs to be shrinkable to allow more room for the map (Maybe this could be fixed in mobile and tablet views)
 TODO: Need a Tablet View
 - Made a function to sense screen sizes. 
+- Loaded map into mobile view
