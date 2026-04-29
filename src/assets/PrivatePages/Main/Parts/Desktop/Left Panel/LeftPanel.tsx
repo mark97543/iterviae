@@ -1,7 +1,7 @@
 import LeftPanelStops from "./Parts/LeftPanelStops";
 import LeftPanelSearch from "./Parts/LeftPanelSearch";
-import { useDirectus } from "../../../../../context/DirectusContext";
-import { useStops } from "../../../../../context/DataContext";
+import { useDirectus } from "../../../../../../context/DirectusContext";
+import { useStops } from "../../../../../../context/DataContext";
 import { useState } from "react";
 import Info from "./Parts/Info";
 import Itin from "./Parts/Itin";

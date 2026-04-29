@@ -1,7 +1,7 @@
-TODO: Need the search for bar to allow adresses and search for locations
 TODO: Add Setting to change colors for routes 
+TODO: Need to Make the address searches background dark as overlay so can read.
+TODO: Search adress needs to disapear when click elsewhere or deldete search (maybe make this live) 
 
-TODO: Need a Tablet View
 TODO: Add save before exiting warning
 TODO: Route Slider for the route
 TODO: Points of interest
@@ -9,20 +9,18 @@ TODO: Directus schema for future downloads
 TODO: Need To set up a debounce autosave
 TODO: Cancel Save Button (Maybe not necessary since we are debouncing the save)
 TODO: Need to Add pagenation to the load trip modal
-TODO: Need a mobile view
+
 TODO: Search For the Open Trip MOdal
-TODO: When Shirking Screen the LoadTripMOdal table goes off the screen Need to set minim screen size (Mayne make this work in mobile and tablet view)
-TODO: When Shrinking the screen the user panel needs to be shrinkable to allow more room for the map (Maybe this could be fixed in mobile and tablet views)
-TODO: Directus somthing to cleanup all stops with no coresponding trip
 TODO: limit Text size for trip summary 
 TODO: Draggable stops to order. 
 TODO: When Creating new trip it needs to load that trip
 TODO: Need to incorperate loading screen when new trip is loaded
+TODO: Need to find a way to make loading faster. 
 
 
 
 Working on the following right now: 
-Print 3.5 x 5.5 (Memo Sized)
-- Need to add the option to the prin menu (Complete)
-- Need to copy the a5 then shrink down (This may be ai) 
-
+TODO: Need a mobile view
+TODO: When Shirking Screen the LoadTripMOdal table goes off the screen Need to set minim screen size (Mayne make this work in mobile and tablet view)
+TODO: When Shrinking the screen the user panel needs to be shrinkable to allow more room for the map (Maybe this could be fixed in mobile and tablet views)
+TODO: Need a Tablet View

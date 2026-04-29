@@ -2,10 +2,10 @@ import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
 import NewTripModal from './Parts/NewTripModal';
 import {useState} from 'react';
-import { useDirectus } from '../../../../../context/DirectusContext';
+import { useDirectus } from '../../../../../../context/DirectusContext';
 import EditTripModal from './Parts/EditTripModal';
 import LoadTripModal from './Parts/LoadTripModal';
-import { useStops } from '../../../../../context/DataContext';
+import { useStops } from '../../../../../../context/DataContext';
 import { useNavigate } from 'react-router-dom';
 import PrintModal from './Parts/PrintModal';
 

@@ -243,6 +243,13 @@ const MapComponent = () => {
             setRoute(null);
             return;
         }
+
+        // PERFORMANCE OPTIMIZATION: 
+        // If we already have a route loaded from Directus and we ARE NOT editing,
+        // do not waste time/bandwidth fetching a new one from Valhalla.
+        if (route && !editMode) {
+            return;
+        }
         
         const timer = setTimeout(async () => {
             try {
@@ -254,7 +261,7 @@ const MapComponent = () => {
         }, 1000); // 1 second debounce
         
         return () => clearTimeout(timer);
-    }, [stops, setRoute]);
+    }, [stops, setRoute, editMode, route]); // Added editMode and route to dependencies
 
     // SIDE EFFECT: Sync Markers with Directus Data
     useEffect(()=>{

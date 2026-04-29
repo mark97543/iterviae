@@ -1,27 +1,34 @@
-// import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
+import { useResponsive } from '../../../hooks/useResponsive.ts';
+import { useDirectus } from '../../../context/DirectusContext';
+import DesktopWrapper from './Parts/Desktop/DesktopWrapper';
 import './Main.css';
-// import { useEffect, useState } from 'react';
-import MapComponent from './Parts/Map/Map';
-import LeftPanel from './Parts/Left Panel/LeftPanel';
-import MemberPanel from './Parts/MemberPanel/MemberPanel';
-import BottomPanel from './Parts/BottomPanel/BottomPanel';
 
 
 
 
 const Dashboard = () => {
     const { user } = useAuth();
+    const { isMobile, isTablet, isDesktop } = useResponsive();
+    const { isLoading } = useDirectus();
 
 
     if (!user) return null; // Component should not render if not authenticated; ProtectedRoute will catch it
 
     return (
-        <div className="dashboard-container">
-            <MapComponent />
-            <LeftPanel />
-            <MemberPanel />
-            <BottomPanel />
+        <div className={`dashboard-container ${isMobile ? 'mobile' : ''} ${isTablet ? 'tablet' : ''}`}>
+            {isLoading && (
+                <div className="loading-overlay">
+                    <div className="loading-spinner"></div>
+                    <p>Loading Trip Data...</p>
+                </div>
+            )}
+            {isDesktop ? (<DesktopWrapper />)
+                :(isTablet ? (<>Tablet Mode</>) 
+                :(isMobile ?(<>Mobile Mode</>)
+                :(<>Error</>
+            )))}
+
         </div>
     );
 };

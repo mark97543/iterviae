@@ -27,6 +27,7 @@ export const DirectusProvider = ({ children }: { children: React.ReactNode }) =>
     const [directus, setDirectus] = useState(null);
     const [trips, setTrips] = useState<Trip[]>([]); /// All Trips for for this user 
     const [currentTrip, setCurrentTrip] = useState<Trip | null>(null); /// Selected Trip for this user
+    const [isLoading, setIsLoading] = useState(false);
     const {stops,setEditMode, setStops, route, setRoute} = useStops();
 
     // Wipe session data when user logs out
@@ -34,12 +35,14 @@ export const DirectusProvider = ({ children }: { children: React.ReactNode }) =>
         if (!user) {
             setTrips([]);
             setCurrentTrip(null);
+            setIsLoading(false);
         }
     }, [user]);
 
     //Save Trip to Directus Database
     const saveTrip = async (tripName: string) => {
         try {
+            setIsLoading(true);
             const token = localStorage.getItem('instrumentum_token');
             const result = await axios.post(`https://api.wade-usa.com/items/trip`, {
                 trip_name: tripName,
@@ -54,13 +57,16 @@ export const DirectusProvider = ({ children }: { children: React.ReactNode }) =>
                 console.log("Trip Saved Successfully");
                 const newTrip = result.data.data;
                 setTrips([...trips, newTrip]);
+                setIsLoading(false);
                 return newTrip;
             } else {
                 console.log("Error Saving Trip");
+                setIsLoading(false);
                 return null;
             }
         } catch (error) {
             console.error("Failed to save trip:", error);
+            setIsLoading(false);
             return null;
         }
     }
@@ -103,8 +109,12 @@ export const DirectusProvider = ({ children }: { children: React.ReactNode }) =>
     //Load data by selected trip ID
     const loadTripData = async (tripId: string) => {
         try {
+            setIsLoading(true);
             const token = localStorage.getItem('instrumentum_token');
-            if (!token || !tripId) return null;
+            if (!token || !tripId) {
+                setIsLoading(false);
+                return null;
+            }
 
             const result = await axios.get(`https://api.wade-usa.com/items/trip`, {
                 params: {
@@ -135,13 +145,16 @@ export const DirectusProvider = ({ children }: { children: React.ReactNode }) =>
                     }
                 }
 
+                setIsLoading(false);
                 return loadedTripData;
             } else {
                 console.log("Error Loading Trip Data");
+                setIsLoading(false);
                 return null;
             }
         } catch (error) {
             console.error("Failed to load trip data:", error);
+            setIsLoading(false);
             return null;
         }
     }
@@ -316,6 +329,7 @@ export const DirectusProvider = ({ children }: { children: React.ReactNode }) =>
             directus, 
             trips, 
             currentTrip, 
+            isLoading,
             setDirectus, 
             setTrips, 
             setCurrentTrip,

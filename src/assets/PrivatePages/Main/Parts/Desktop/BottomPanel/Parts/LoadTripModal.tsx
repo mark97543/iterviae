@@ -225,11 +225,7 @@ const LoadTripModal = ({setModal}: {setModal: (show: boolean) => void}) => {
                                 <tr 
                                     key={trip.id} 
                                     onClick={async () => {
-                                        setSelectedTrip(trip.id);
-                                        let data = await loadTripData(trip.id);
-                                        if (data) setStops(data.stop);
-                                        let route = await getTripDirections(data.stop);
-                                        setRoute(route);
+                                        await loadTripData(trip.id);
                                         setModal(false);
                                     }}
                                 >
