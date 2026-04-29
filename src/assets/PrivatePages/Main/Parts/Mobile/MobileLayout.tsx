@@ -11,8 +11,8 @@ const MOBILE_UI_STYLE = `
     }
     
     .map-container {
-        width: 100vw;
-        height:50vh;
+        width: 100%;
+        height: 50vh;
         position: relative; /* Essential for absolute-positioned children like the map */
         background: #09090b; /* Match map background */
         display: flex;

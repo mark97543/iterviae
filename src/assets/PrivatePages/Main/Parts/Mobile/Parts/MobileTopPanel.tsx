@@ -12,7 +12,7 @@ const MobileTopPanel_Style = `
         padding-bottom: var(--gap-small);
         padding-left: var(--gap-small);
         padding-right: var(--gap-small);
-        box-sizing: border-box;        
+        box-sizing: border-box;     
     }
 
     .welcome-message{
@@ -24,7 +24,7 @@ const MobileTopPanel_Style = `
 `;
 
 const listItems = [
-    { id: '2', label: 'My Trips', link: '/trips' }
+    { id: '1', label: 'Load Trip', link: '/mobile_loadtrip' }
 ];
 
 

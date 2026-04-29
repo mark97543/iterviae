@@ -79,7 +79,7 @@ export const DirectusProvider = ({ children }: { children: React.ReactNode }) =>
 
             const result = await axios.get(`https://api.wade-usa.com/items/trip`, {
                 params: {
-                    fields: 'id,trip_name, distance, ride_time, status',
+                    fields: 'id,trip_name, distance, ride_time, status, start_date',
                     filter: {
                         user_created: {
                             _eq: user.id

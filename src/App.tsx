@@ -12,6 +12,7 @@ import MissingPage from './assets/PublicPages/404Page/MissingPage'
 import { DirectusProvider } from './context/DirectusContext'
 import A4Page from './assets/PrivatePages/Print/A5Page'
 import MemoPage from './assets/PrivatePages/Print/MemoPage'
+import LoadTripScreen from './assets/PrivatePages/Main/Parts/Mobile/LoadTripScreen'
 
 function App() {
 
@@ -27,6 +28,7 @@ function App() {
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/a4print" element={<ProtectedRoute><A4Page /></ProtectedRoute>} />
             <Route path="/memoprint" element={<ProtectedRoute><MemoPage /></ProtectedRoute>} />
+            <Route path="/mobile_loadtrip" element={<ProtectedRoute><LoadTripScreen /></ProtectedRoute>} />
             <Route path="*" element={<MissingPage />} />
           </Routes>
         </DirectusProvider>
