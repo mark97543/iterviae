@@ -1,6 +1,7 @@
 import { useDirectus } from "../../../../../context/DirectusContext";
 import { useEffect, useState } from "react";
 import { useStops } from "../../../../../context/DataContext";
+import { useNavigate } from "react-router-dom";
 
 
 const LoadTripScreenStyle = `
@@ -176,6 +177,8 @@ const LoadTripScreen = () => {
     const { loadTrips, loadTripData, deleteTripByID, setCurrentTrip  } = useDirectus();
     const [tripSelections, setTripSelections] = useState([]);
     const {setSelectedTrip, setStops, setRoute} = useStops();
+    const navigate = useNavigate();
+
 
     useEffect(() => {
         const loadAll = async () => {
@@ -199,8 +202,11 @@ const LoadTripScreen = () => {
         reload();
     }
 
-
-    console.log(tripSelections);
+    const loadTrip = async (tripId: string) => {
+        await loadTripData(tripId);
+        setSelectedTrip(tripId);
+        navigate('/dashboard');
+    }
 
     return (
         <div className="mobile-trip-wrapper">
@@ -212,7 +218,7 @@ const LoadTripScreen = () => {
 
             <div className="trip-list">
                 {tripSelections.map((trip: any) => (
-                    <div className='trip-card' key={trip.id}>
+                    <div className='trip-card' onClick={() => loadTrip(trip.id)} key={trip.id}>
                         <div className="trip-card-header">
                             <span className="trip-name">{trip.trip_name}</span>
                         </div>
