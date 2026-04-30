@@ -310,6 +310,7 @@ export const DirectusProvider = ({ children }: { children: React.ReactNode }) =>
 
     // ** DEBOUNCED AUTOSAVE **
     // This watches for changes to the trip or stops and saves after a 2s delay
+    /*
     useEffect(() => {
         if (!currentTrip?.id || !user) return;
 
@@ -323,6 +324,7 @@ export const DirectusProvider = ({ children }: { children: React.ReactNode }) =>
 
         return () => clearTimeout(timer);
     }, [currentTrip?.trip_name, currentTrip?.summary, currentTrip?.status, currentTrip?.start_date, stops, route]);
+    */
 
     return (
         <DirectusContext.Provider value={{ 
