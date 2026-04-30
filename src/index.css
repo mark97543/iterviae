@@ -40,26 +40,23 @@
   --mobile-width: 480px;
 }
 
-html, body {
+body {
   margin: 0;
   padding: 0;
-  height: 100vh;
-  width: 100vw;
+  min-height: 100vh;
   background-color: var(--color-bg);
   color: var(--color-text);
   font-family: sans-serif;
-  overflow: hidden;
-  overscroll-behavior: none;
-  position: fixed; /* Prevent scrolling on mobile */
+  /* min-width: 600px; */
 }
 
 #root {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100%;
-  height: 100dvh;
+  min-height: 100vh;
   width: 100vw;
+  padding: var(--gap-medium);
   box-sizing: border-box;
 }
 
