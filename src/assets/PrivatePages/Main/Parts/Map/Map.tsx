@@ -261,7 +261,7 @@ const MapComponent = () => {
         }, 1000); // 1 second debounce
         
         return () => clearTimeout(timer);
-    }, [stops, setRoute, editMode, route]); // Added editMode and route to dependencies
+    }, [stops, setRoute, editMode]); // Removed route from dependencies to prevent infinite loop
 
     // SIDE EFFECT: Sync Markers with Directus Data
     useEffect(()=>{
