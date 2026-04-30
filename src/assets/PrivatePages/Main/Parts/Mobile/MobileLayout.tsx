@@ -13,12 +13,20 @@ const MOBILE_UI_STYLE = `
     
     .map-container {
         width: 100%;
-        height: 50vh;
-        position: relative; /* Essential for absolute-positioned children like the map */
-        background: #09090b; /* Match map background */
+        height: 40vh;
+        position: relative;
+        background: #09090b;
         display: flex;
         flex-direction: column;
-        border-radius:var(--gap-large);
+        border-bottom: 2px solid var(--color-accent);
+        flex-shrink: 0;
+    }
+
+    .bottom-panel {
+        flex: 1;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
     }
 
 `;
