@@ -127,7 +127,7 @@ const LeftPanel = () =>{
                     <Itin/>
                 )}
             </div>
-            {editMode ? <button className="std-button" style={{marginTop: 'auto'}} onClick={()=>saveTripByID(selectedTrip)}>Save Trip</button> : null}
+            {editMode ? <button className="std-button" style={{marginTop: 'auto'}} onClick={() => saveTripByID(currentTrip?.id || selectedTrip)}>Save Trip</button> : null}
         </div>
     )
 }

@@ -136,10 +136,20 @@ export const DirectusProvider = ({ children }: { children: React.ReactNode }) =>
                 setCurrentTrip(loadedTripData);
                 setStops(loadedTripData.stop || []);
                 
-                // Safety check for route parsing (in case field is empty)
+                // Safety check for route parsing
                 if (loadedTripData.route_data) {
                     try {
-                        setRoute(JSON.parse(loadedTripData.route_data));
+                        if (typeof loadedTripData.route_data === 'object') {
+                            // If it's already an object, use it directly
+                            setRoute(loadedTripData.route_data);
+                        } else if (loadedTripData.route_data === "[object Object]") {
+                            // If it's the corrupted string, ignore it so Map.tsx can recalculate
+                            console.warn("Corrupted route_data found, clearing for recalculation");
+                            setRoute(null);
+                        } else {
+                            // Otherwise, parse it
+                            setRoute(JSON.parse(loadedTripData.route_data));
+                        }
                     } catch (e) {
                         console.error("Error parsing route_data:", e);
                     }
@@ -160,10 +170,15 @@ export const DirectusProvider = ({ children }: { children: React.ReactNode }) =>
     }
 
     //Save Trip by ID
-    const saveTripByID = async (tripId: string, silent: boolean = false, stopsToSave?: Stop[]) => {
+    const saveTripByID = async (tripId?: string, silent: boolean = false, stopsToSave?: Stop[]) => {
         try {
             const token = localStorage.getItem('instrumentum_token');
-            if (!token || !tripId) return null;
+            const idToSave = tripId || currentTrip?.id;
+
+            if (!token || !idToSave) {
+                console.warn("Cannot save: Missing token or Trip ID");
+                return null;
+            }
 
             const createStops: any[] = [];
             const updateStops: any[] = [];
@@ -217,7 +232,7 @@ export const DirectusProvider = ({ children }: { children: React.ReactNode }) =>
                 if (updateStops.length > 0) payload.stop.update = updateStops;
             }
 
-            const result = await axios.patch(`https://api.wade-usa.com/items/trip/${tripId}`, payload, {
+            const result = await axios.patch(`https://api.wade-usa.com/items/trip/${idToSave}`, payload, {
                 params: {
                     fields: '*,stop.*' // Ensure we get the full updated trip back
                 },
