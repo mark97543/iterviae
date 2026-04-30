@@ -1,4 +1,6 @@
 import { useStops } from "../../../../../../../context/DataContext";
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 const LEFTPANELSTOPSSTYLE = `
     .left-panel-stops-wrapper{
@@ -14,6 +16,12 @@ const LEFTPANELSTOPSSTYLE = `
     .stop-item-container {
         display: flex;
         flex-direction: column;
+        /* Prevent layout shift during drag */
+        touch-action: none;
+    }
+
+    .stop-item-container.dragging {
+        opacity: 0.5;
     }
 
     .stop-name-location {
@@ -75,8 +83,46 @@ const LEFTPANELSTOPSSTYLE = `
     }
 `;
 
-const LeftPanelStops =()=>{
-    const {stops, route, setFocusedID} = useStops();
+const SortableStop = ({ stop, index, route, secondsToHms, setFocus, editMode }: any) => {
+    const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ 
+        id: stop.id,
+        disabled: !editMode 
+    });
+
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+        zIndex: isDragging ? 100 : 1,
+        position: 'relative' as 'relative',
+    };
+
+    return (
+        <div 
+            ref={setNodeRef} 
+            style={style} 
+            {...attributes} 
+            {...listeners} 
+            className={`stop-item-container ${isDragging ? 'dragging' : ''}`}
+        >
+            <div className="stop-name-location" onClick={() => setFocus(stop)}>
+                <p className="stop-name">{stop.name || 'Unnamed Stop'}</p>
+                <p className="stop-coords">{Number(stop.longitude).toFixed(5)}, {Number(stop.latitude).toFixed(5)}</p>
+            </div>
+            {/* Only show the leg stats if Valhalla returned legs, and if this isn't the final stop */}
+            {route?.legs && index < route.legs.length && (
+                <div className="left-panel-stop-stats">
+                    <div className="stat-line"></div>
+                    <span>{route.legs[index]?.summary?.length?.toFixed(1)} mi</span>
+                    <span className="stat-dot">•</span>
+                    <span>{secondsToHms(route.legs[index]?.summary?.time)}</span>                        
+                </div>
+            )}
+        </div>
+    );
+};
+
+const LeftPanelStops = () => {
+    const { stops, route, setFocusedID, editMode } = useStops();
 
     //Seconds to XXhr XXmin format
     function secondsToHms(d: number) {
@@ -97,24 +143,18 @@ const LeftPanelStops =()=>{
         <div className="left-panel-stops-wrapper">
             <style>{LEFTPANELSTOPSSTYLE}</style>
             {stops.map((stop: any, index: number) => (
-                <div key={stop.id} className="stop-item-container">
-                    <div className="stop-name-location" onClick={() => setFocus(stop)}>
-                        <p className="stop-name">{stop.name || 'Unnamed Stop'}</p>
-                        <p className="stop-coords">{Number(stop.longitude).toFixed(5)}, {Number(stop.latitude).toFixed(5)}</p>
-                    </div>
-                    {/* Only show the leg stats if Valhalla returned legs, and if this isn't the final stop */}
-                    {route?.legs && index < route.legs.length && (
-                        <div className="left-panel-stop-stats">
-                            <div className="stat-line"></div>
-                            <span>{route.legs[index]?.summary?.length?.toFixed(1)} mi</span>
-                            <span className="stat-dot">•</span>
-                            <span>{secondsToHms(route.legs[index]?.summary?.time)}</span>                        
-                        </div>
-                    )}
-                </div>
+                <SortableStop 
+                    key={stop.id} 
+                    stop={stop} 
+                    index={index} 
+                    route={route} 
+                    secondsToHms={secondsToHms} 
+                    setFocus={setFocus}
+                    editMode={editMode}
+                />
             ))}
         </div>
-    )
+    );
 }
 
 export default LeftPanelStops;

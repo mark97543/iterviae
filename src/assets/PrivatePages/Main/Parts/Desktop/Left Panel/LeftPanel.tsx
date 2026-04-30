@@ -5,6 +5,8 @@ import { useStops } from "../../../../../../context/DataContext";
 import { useState } from "react";
 import Info from "./Parts/Info";
 import Itin from "./Parts/Itin";
+import { DndContext, closestCenter } from '@dnd-kit/core';
+import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 
 
 const LeftPanel_Style = `
@@ -93,8 +95,34 @@ const LeftPanel_Style = `
 
 const LeftPanel = () =>{
     const {saveTripByID, currentTrip} = useDirectus();
-    const {selectedTrip, editMode} = useStops();
+    const {selectedTrip, editMode, stops, setStops} = useStops();
     const [selectedTab, setSelectedTab] = useState(1); // Default to Stops tab
+
+    const handleDragEnd = (event: any) => {
+        if (!editMode) return;
+
+        const { active, over } = event;
+        
+        if (active && over && active.id !== over.id) {
+            console.log(`Dragging stop ${active.id} over ${over.id}`);
+            
+            const oldIndex = stops.findIndex((stop: any) => stop.id === active.id);
+            const newIndex = stops.findIndex((stop: any) => stop.id === over.id);
+            
+            if (oldIndex !== -1 && newIndex !== -1) {
+                console.log(`Moving from index ${oldIndex} to ${newIndex}`);
+                const movedArray = arrayMove(stops, oldIndex, newIndex);
+                
+                // Re-assign the 'sort' field based on the new array order
+                const newOrder = movedArray.map((stop: any, idx: number) => ({
+                    ...stop,
+                    sort: idx + 1 // Directus usually uses 1-based sorting
+                }));
+                
+                setStops(newOrder);
+            }
+        }
+    };
 
 
     return(
@@ -115,7 +143,11 @@ const LeftPanel = () =>{
                         {currentTrip ? (
                             <>
                                 <LeftPanelSearch/>
-                                <LeftPanelStops/>
+                                <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                                    <SortableContext items={stops.map((stop:any)=>stop.id)} strategy={verticalListSortingStrategy}>
+                                        <LeftPanelStops/>
+                                    </SortableContext>
+                                </DndContext>
                             </>
                         ):(
                             <div style={{color: 'var(--color-primary)', textAlign: 'center', marginTop: '20px'}}>No Trip Selected</div>

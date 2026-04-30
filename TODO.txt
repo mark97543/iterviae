@@ -6,13 +6,12 @@ TODO: Add save before exiting warning
 TODO: Route Slider for the route
 TODO: Points of interest
 TODO: Directus schema for future downloads
-TODO: Need To set up a debounce autosave
 TODO: Cancel Save Button (Maybe not necessary since we are debouncing the save)
 TODO: Need to Add pagenation to the load trip modal
-
 TODO: Search For the Open Trip MOdal
 TODO: limit Text size for trip summary 
-TODO: Draggable stops to order. => Version 1.2
+TODO: BUG When Deleteing a rout the route remains need to review this. or we need to add a effect when the slected trip is null the route is nullufied as well 
+
 TODO: When Creating new trip it needs to load that trip => Version 1.6
 TODO: Need a loading screen when trips are saved => Version 1.4
 TODO: Make Map Maximize screen go away on default one
@@ -23,7 +22,7 @@ TODO: Cleanup Map.tsx into different components. => Version 1.5
 
 
 ####### Working on the following right now ########## 
-
+TODO: Draggable stops to order. => Version 1.2
 
 
 
