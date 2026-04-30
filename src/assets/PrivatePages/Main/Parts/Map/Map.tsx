@@ -485,6 +485,60 @@ const MapComponent = () => {
         }
     }, [route, mapLoaded]);
 
+    // Side Effect: Auto focus the map when a trip is loaded
+    useEffect(() => {
+        if (!mapLoaded || !map.current) return;
+        if (editMode) return;
+
+        // 1. Get ONLY the stops that have valid coordinates (Forcing them to Numbers)
+        const validCoords = stops
+            .map(s => [Number(s.longitude), Number(s.latitude)] as [number, number])
+            .filter(coord => 
+                !isNaN(coord[0]) && !isNaN(coord[1]) && 
+                coord[0] !== 0 && coord[1] !== 0
+            );
+
+        if (validCoords.length === 0) return;
+
+        console.log(`Auto-focusing map for trip (${validCoords.length} valid points)...`);
+
+        if (validCoords.length === 1) {
+            // SCENARIO: Single valid point
+            map.current.flyTo({
+                center: validCoords[0],
+                zoom: MAP_POINT_ZOOM,
+                duration: 2500,
+                essential: true,
+            });
+        } else {
+            // SCENARIO: Multiple valid points - Manual Bounding Box Calculation
+            const lons = validCoords.map(c => c[0]);
+            const lats = validCoords.map(c => c[1]);
+            
+            const west = Math.min(...lons);
+            const south = Math.min(...lats);
+            const east = Math.max(...lons);
+            const north = Math.max(...lats);
+
+            // If it's effectively a single point despite having multiple stops
+            if (west === east && south === north) {
+                map.current.flyTo({
+                    center: [west, south],
+                    zoom: MAP_POINT_ZOOM,
+                    duration: 2500,
+                    essential: true,
+                });
+            } else {
+                // Pass the raw bounding box array: [[west, south], [east, north]]
+                map.current.fitBounds([[west, south], [east, north]], {
+                    padding: 80,
+                    duration: 2500,
+                    essential: true
+                });
+            }
+        }
+    }, [currentTrip?.id, mapLoaded]);
+
     return (
         <div className="map-wrapper">
             <style>{MAP_STYLES}</style>

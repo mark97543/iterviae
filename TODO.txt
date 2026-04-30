@@ -1,6 +1,6 @@
 TODO: Add Setting to change colors for routes 
-TODO: Need to Make the address searches background dark as overlay so can read.
-TODO: Search adress needs to disapear when click elsewhere or deldete search (maybe make this live) 
+TODO: Need to Make the address searches background dark as overlay so can read. => Version 1.3
+TODO: Search adress needs to disapear when click elsewhere or deldete search (maybe make this live) => Version 1.3
 
 TODO: Add save before exiting warning
 TODO: Route Slider for the route
@@ -12,20 +12,21 @@ TODO: Need to Add pagenation to the load trip modal
 
 TODO: Search For the Open Trip MOdal
 TODO: limit Text size for trip summary 
-TODO: Draggable stops to order. 
-TODO: When Creating new trip it needs to load that trip
-TODO: Need to incorperate loading screen when new trip is loaded
+TODO: Draggable stops to order. => Version 1.2
+TODO: When Creating new trip it needs to load that trip => Version 1.6
+TODO: Need a loading screen when trips are saved => Version 1.4
 TODO: Make Map Maximize screen go away on default one
-TODO: On Load Trip need to fly to route or stop if points exist.
+TODO: Tablet Mode => Version 1.7
+TODO: Need to add trip metrics option on the progression 
+TODO: Cleanup Map.tsx into different components. => Version 1.5
 
 
 
-Working on the following right now: 
-TODO: Need a mobile view
-TODO: When Shirking Screen the LoadTripMOdal table goes off the screen Need to set minim screen size (Mayne make this work in mobile and tablet view)
-TODO: When Shrinking the screen the user panel needs to be shrinkable to allow more room for the map (Maybe this could be fixed in mobile and tablet views)
-TODO: Need a Tablet View
-- Made a function to sense screen sizes. 
-- Loaded map into mobile view
-- Load Scxreen for mobile view si complete 
+####### Working on the following right now ########## 
+
+
+
+
+
+############## Version 2 #################
 
