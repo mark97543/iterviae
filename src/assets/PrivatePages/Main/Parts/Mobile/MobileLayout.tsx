@@ -13,7 +13,7 @@ const MOBILE_UI_STYLE = `
     
     .map-container {
         width: 100%;
-        height: 40vh;
+        height: 30vh;
         position: relative;
         background: #09090b;
         display: flex;
