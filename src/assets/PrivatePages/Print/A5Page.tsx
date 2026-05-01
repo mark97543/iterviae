@@ -31,6 +31,14 @@ const A5PAGE_STYLE = `
         border-bottom: 2px solid black;
         width: 100%;
         box-sizing: border-box;   
+
+        /* 2-Line Clamp Logic */
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        line-height: 1.2;
+        max-height: 2.4em; /* Exactly 2 lines at 1.2 line-height */
     }
 
     .trip-summary{
@@ -138,10 +146,14 @@ const A5PAGE_STYLE = `
         color: #000;
         letter-spacing: -0.5px; 
         text-transform: uppercase;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
         max-width: 70%;
+        
+        /* 2-Line Clamp Logic */
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        white-space: normal;
     }
 
     .stop-meta {
@@ -424,7 +436,7 @@ export const A5Page = () => {
                             <div className="trip-stop" key={index}>
                                 {/* Header: Title on the left, Meta on the right */}
                                 <div className="stop-header">
-                                    <h4>{stop.name}</h4>
+                                    <h4>{stop.name || (stop.type === 'start' ? 'Trip Start' : stop.type === 'shaping' ? 'Shaping Point' : 'Waypoint')}</h4>
                                     <span className="stop-meta">
                                         {Number(stop.latitude).toFixed(4)}, {Number(stop.longitude).toFixed(4)}
                                         {Number(stop.budget) > 0 && ` | Budget: $${Number(stop.budget).toFixed(2)}`}

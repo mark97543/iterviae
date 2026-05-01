@@ -295,7 +295,10 @@ const MarkerPopup = memo(({
                                 <select 
                                     className="input-dark" 
                                     value={point.type || 'waypoint'}
-                                    onChange={(e) => setStops(stops.map((s: any) => s.id === point.id ? { ...s, type: e.target.value } : s))}
+                                    onChange={(e) => {
+                                        const newType = e.target.value;
+                                        setStops(stops.map((s: any) => s.id === point.id ? { ...s, type: newType, stay_duration: newType === 'shaping' ? 0 : s.stay_duration } : s));
+                                    }}
                                 >
                                     {STOP_TYPES.map(type => (
                                         <option key={type.id} value={type.id}>{type.icon} {type.label}</option>

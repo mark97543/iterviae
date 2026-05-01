@@ -19,6 +19,12 @@ export const STOP_TYPES: StopType[] = [
         color: '#f97316' // Iter Viae Orange
     },
     {
+        id: 'shaping',
+        label: 'Shaping Point',
+        icon: '💠',
+        color: '#94a3b8' // Slate-400
+    },
+    {
         id: 'gas',
         label: 'Fuel / Gas',
         icon: '⛽',

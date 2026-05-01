@@ -1,6 +1,7 @@
 import { useStops } from "../../../../../../../context/DataContext";
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { getStopType } from "../../../../../../../constants/StopTypes";
 
 const LEFTPANELSTOPSSTYLE = `
     .left-panel-stops-wrapper{
@@ -105,7 +106,9 @@ const SortableStop = ({ stop, index, route, secondsToHms, setFocus, editMode }: 
             className={`stop-item-container ${isDragging ? 'dragging' : ''}`}
         >
             <div className="stop-name-location" onClick={() => setFocus(stop)}>
-                <p className="stop-name">{stop.name || 'Unnamed Stop'}</p>
+                <p className="stop-name">
+                    {getStopType(stop.type).icon} {stop.name || (stop.type === 'start' ? 'Trip Start' : stop.type === 'shaping' ? 'Shaping Point' : 'Waypoint')}
+                </p>
                 <p className="stop-coords">{Number(stop.longitude).toFixed(5)}, {Number(stop.latitude).toFixed(5)}</p>
             </div>
             {/* Only show the leg stats if Valhalla returned legs, and if this isn't the final stop */}

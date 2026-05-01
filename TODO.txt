@@ -1,6 +1,5 @@
 TODO: Add Setting to change colors for routes 
-TODO: Need to Make the address searches background dark as overlay so can read. => Version 1.3
-TODO: Search adress needs to disapear when click elsewhere or deldete search (maybe make this live) => Version 1.3
+
 
 TODO: Add save before exiting warning
 TODO: Route Slider for the route
@@ -10,7 +9,7 @@ TODO: Cancel Save Button (Maybe not necessary since we are debouncing the save)
 TODO: Need to Add pagenation to the load trip modal
 TODO: Search For the Open Trip MOdal
 TODO: limit Text size for trip summary 
-TODO: BUG When Deleteing a rout the route remains need to review this. or we need to add a effect when the slected trip is null the route is nullufied as well 
+TODO: BUG: When Deleteing a rout the route remains need to review this. or we need to add a effect when the slected trip is null the route is nullufied as well 
 
 TODO: When Creating new trip it needs to load that trip => Version 1.6
 TODO: Need a loading screen when trips are saved => Version 1.4
@@ -22,7 +21,8 @@ TODO: Cleanup Map.tsx into different components. => Version 1.5
 
 
 ####### Working on the following right now ########## 
-TODO: Draggable stops to order. => Version 1.2
+TODO: Need to Make the address searches background dark as overlay so can read. => Version 1.3
+TODO: Search adress needs to disapear when click elsewhere or deldete search (maybe make this live) => Version 1.3
 
 
 

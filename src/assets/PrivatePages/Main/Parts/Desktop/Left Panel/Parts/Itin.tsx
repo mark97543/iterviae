@@ -315,7 +315,7 @@ const Itin = () => {
                                                 <div className="stop-dot" style={{borderColor: stopType.color}}></div>
                                                 <div className="stop-card" onClick={() => setFocusedID(stop.id)}>
                                                     <div className="stop-top">
-                                                        <div className="stop-name">{stopType.icon} {stop.name || (stop.type === 'start' ? 'Trip Start' : 'Waypoint')}</div>
+                                                        <div className="stop-name">{stopType.icon} {stop.name || (stop.type === 'start' ? 'Trip Start' : stop.type === 'shaping' ? 'Shaping Point' : 'Waypoint')}</div>
                                                     </div>
                                                     <div className="stop-meta">
                                                         <span>{stopType.label}</span>

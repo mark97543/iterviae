@@ -437,7 +437,7 @@ export const MemoPage = () => {
                                 <div className="trip-stop">
                                     {/* Header: Title on the left, Meta on the right */}
                                     <div className="stop-header">
-                                        <h4>{stop.name}</h4>
+                                        <h4>{stop.name || (stop.type === 'start' ? 'Trip Start' : stop.type === 'shaping' ? 'Shaping Point' : 'Waypoint')}</h4>
                                         <div className="stop-meta">
                                             <div>{Number(stop.latitude).toFixed(4)}, {Number(stop.longitude).toFixed(4)}</div>
                                             {Number(stop.budget) > 0 && <div>Budget: ${Number(stop.budget).toFixed(2)}</div>}
