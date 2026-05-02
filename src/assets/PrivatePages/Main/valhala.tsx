@@ -101,7 +101,14 @@ const getTripDirections = async (stops: Stop[]) => {
         allShapes.push(...data.trip.legs.map((leg: any) => leg.shape));
         totalDistance += segmentDistance;
         totalDuration += segmentDuration;
-        allLegs.push(...data.trip.legs);
+        
+        // SLIM DOWN: We only need the summary (time/distance) for the itinerary, not the maneuvers!
+        allLegs.push(...data.trip.legs.map((leg: any) => ({
+            summary: leg.summary,
+            // We don't even need the shape here since it's already in allShapes, 
+            // but we keep it if any component needs leg-specific shapes.
+            shape: leg.shape 
+        })));
     }
 
     return {

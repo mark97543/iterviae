@@ -215,6 +215,16 @@ export const DirectusProvider = ({ children }: { children: React.ReactNode }) =>
                 }
             });
 
+            // SMART PATCHING: 
+            // We only send route_data if the route object has actually changed.
+            // This prevents massive uploads during simple text edits.
+            const currentRouteStr = route ? JSON.stringify(route) : null;
+            const savedRouteStr = typeof currentTrip?.route_data === 'object' 
+                ? JSON.stringify(currentTrip.route_data) 
+                : currentTrip?.route_data;
+
+            const routeChanged = currentRouteStr !== savedRouteStr;
+
             const payload: any = {
                 trip_name: currentTrip?.trip_name,
                 status: currentTrip?.status,
@@ -222,8 +232,13 @@ export const DirectusProvider = ({ children }: { children: React.ReactNode }) =>
                 distance: route ? Number(route.distance) : 0,
                 ride_time: route ? Number(route.duration) : 0,
                 start_date: currentTrip?.start_date || null,
-                route_data: route ? JSON.stringify(route) : null,
             };
+
+            // Only include route_data if it's new
+            if (routeChanged) {
+                console.log("Route changed, including route_data in payload");
+                payload.route_data = currentRouteStr;
+            }
 
             // Only add stop updates if there are any
             if (createStops.length > 0 || updateStops.length > 0) {
@@ -247,6 +262,9 @@ export const DirectusProvider = ({ children }: { children: React.ReactNode }) =>
                 
                 // Update local trips list
                 setTrips(trips.map(t => t.id === updatedTrip.id ? updatedTrip : t));
+                
+                // Sync current trip state
+                setCurrentTrip(updatedTrip);
                 
                 // Sync local stops with the new IDs from the database
                 if (updatedTrip.stop) {
